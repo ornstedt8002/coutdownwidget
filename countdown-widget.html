@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Countdown Widget</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page-bg:
+        linear-gradient(135deg, rgba(41, 46, 36, 0.82), rgba(89, 70, 55, 0.68)),
+        radial-gradient(circle at 12% 18%, rgba(189, 210, 168, 0.26), transparent 34%),
+        radial-gradient(circle at 88% 22%, rgba(247, 232, 215, 0.22), transparent 30%),
+        linear-gradient(140deg, #3a4031, #564337 58%, #2f3229);
+      --accent: #b7c49f;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --card-border: rgba(255, 255, 255, 0.56);
+      --label-color: rgba(255, 255, 255, 0.94);
+      --separator-color: rgba(255, 255, 255, 0.94);
+      --title-color: #ffffff;
+      --card-shadow: 0 22px 46px rgba(19, 18, 16, 0.24);
+      --radius: 10px;
+      --countdown-gap: 20px;
+      --digit-gap: 8px;
+      --digit-width: 68px;
+      --digit-height: 96px;
+      --digit-font-size: 3rem;
+      --label-font-size: 1.95rem;
+      --title-font-size: 1.25rem;
+      --panel-padding: 32px;
+      --blur-strength: 0px;
+      --panel-max-width: 1240px;
+      --panel-bg: transparent;
+      --panel-border: transparent;
+      --panel-shadow: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      background: var(--page-bg);
+      background-position: center;
+      background-size: cover;
+      color: #fff;
+      font-family: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
+      overflow-x: hidden;
+    }
+
+    body[data-theme="glass"] {
+      --accent: #ffffff;
+      --card-bg: rgba(255, 255, 255, 0.16);
+      --card-border: rgba(255, 255, 255, 0.28);
+      --label-color: rgba(255, 255, 255, 0.88);
+      --separator-color: rgba(255, 255, 255, 0.9);
+      --card-shadow: 0 22px 48px rgba(10, 15, 25, 0.28);
+      --radius: 18px;
+      --blur-strength: 18px;
+      --page-bg:
+        linear-gradient(140deg, rgba(17, 39, 55, 0.9), rgba(62, 86, 109, 0.8)),
+        radial-gradient(circle at 20% 20%, rgba(127, 205, 255, 0.2), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(224, 255, 255, 0.16), transparent 24%),
+        linear-gradient(130deg, #173140, #214357 48%, #102738);
+    }
+
+    body[data-theme="midnight"] {
+      --accent: #f8d47b;
+      --card-bg: linear-gradient(180deg, #1a2333, #111827);
+      --card-border: rgba(248, 212, 123, 0.2);
+      --label-color: rgba(244, 246, 248, 0.9);
+      --separator-color: rgba(248, 212, 123, 0.85);
+      --card-shadow: 0 18px 42px rgba(2, 8, 23, 0.45);
+      --radius: 14px;
+      --page-bg:
+        radial-gradient(circle at 50% 0%, rgba(248, 212, 123, 0.1), transparent 26%),
+        linear-gradient(140deg, #050912, #0f172a 55%, #111827);
+    }
+
+    body[data-theme="minimal"] {
+      --accent: #223032;
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --card-border: rgba(34, 48, 50, 0.14);
+      --label-color: rgba(34, 48, 50, 0.88);
+      --separator-color: rgba(34, 48, 50, 0.72);
+      --title-color: #223032;
+      --card-shadow: none;
+      --radius: 18px;
+      --digit-gap: 10px;
+      --page-bg:
+        radial-gradient(circle at top right, rgba(215, 224, 216, 0.9), transparent 25%),
+        linear-gradient(135deg, #f5f1eb, #e4ece5 56%, #eef4f0);
+      --panel-bg: rgba(255, 255, 255, 0.42);
+      --panel-border: rgba(34, 48, 50, 0.08);
+      --panel-shadow: 0 12px 38px rgba(34, 48, 50, 0.08);
+    }
+
+    body[data-has-image="true"] {
+      background-image: var(--page-bg), var(--image-url);
+      background-position: center, center;
+      background-size: cover, cover;
+    }
+
+    .widget-shell {
+      width: min(var(--panel-max-width), calc(100vw - 24px));
+      padding: var(--panel-padding);
+      border-radius: calc(var(--radius) + 10px);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .header {
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: var(--title-font-size);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--title-color);
+    }
+
+    .subtitle {
+      font-size: 0.96rem;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    body[data-theme="minimal"] .subtitle {
+      color: rgba(34, 48, 50, 0.72);
+    }
+
+    .countdown {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      gap: var(--countdown-gap);
+    }
+
+    .unit {
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+      min-width: min-content;
+    }
+
+    .digits {
+      display: flex;
+      gap: var(--digit-gap);
+      align-items: center;
+    }
+
+    .digit {
+      width: var(--digit-width);
+      height: var(--digit-height);
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      backdrop-filter: blur(var(--blur-strength));
+      color: var(--accent);
+      font-size: var(--digit-font-size);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      text-align: center;
+    }
+
+    .separator {
+      align-self: start;
+      padding-top: 14px;
+      color: var(--separator-color);
+      font-size: clamp(2.4rem, 4.2vw, 4.5rem);
+      font-weight: 700;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .label {
+      color: var(--label-color);
+      font-size: clamp(1rem, 2vw, var(--label-font-size));
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+      text-shadow: 0 1px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .status {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.96rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    body[data-theme="minimal"] .status {
+      color: rgba(34, 48, 50, 0.78);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 960px) {
+      :root {
+        --digit-width: 60px;
+        --digit-height: 82px;
+        --digit-font-size: 2.55rem;
+        --panel-padding: 22px;
+        --countdown-gap: 16px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      :root {
+        --digit-width: 54px;
+        --digit-height: 74px;
+        --digit-font-size: 2.2rem;
+        --digit-gap: 6px;
+        --countdown-gap: 12px;
+        --panel-padding: 18px;
+      }
+
+      .separator {
+        font-size: 2rem;
+        padding-top: 12px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .countdown {
+        gap: 14px 10px;
+      }
+
+      .separator {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body data-theme="soft" data-has-image="false">
+  <main class="widget-shell">
+    <header class="header hidden" id="header">
+      <div class="title" id="title"></div>
+      <div class="subtitle hidden" id="subtitle"></div>
+    </header>
+    <section class="countdown" id="countdown" aria-live="polite"></section>
+    <div class="status hidden" id="status"></div>
+  </main>
+
+  <script>
+    const LABELS = {
+      sv: ["Dagar", "Timmar", "Minuter", "Sekunder"],
+      en: ["Days", "Hours", "Minutes", "Seconds"],
+      no: ["Dager", "Timer", "Minutter", "Sekunder"],
+      da: ["Dage", "Timer", "Minutter", "Sekunder"]
+    };
+
+    const DEFAULTS = {
+      target: "2026-12-31T23:59:59+01:00",
+      theme: "soft",
+      lang: "sv",
+      title: "",
+      subtitle: "",
+      endText: "Nedrakningen ar klar",
+      daysDigits: 3,
+      showLabels: true,
+      showSeparators: true,
+      accent: "",
+      card: "",
+      cardBorder: "",
+      label: "",
+      separator: "",
+      titleColor: "",
+      background: "",
+      image: "",
+      radius: "",
+      gap: "",
+      digitGap: "",
+      width: "",
+      height: "",
+      digitWidth: "",
+      digitHeight: "",
+      digitFont: "",
+      panelBg: "",
+      panelBorder: "",
+      panelShadow: "",
+      titleSize: "",
+      labelSize: "",
+      padding: "",
+      labels: ""
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const config = { ...DEFAULTS };
+
+    for (const key of Object.keys(DEFAULTS)) {
+      if (params.has(key)) {
+        config[key] = params.get(key);
+      }
+    }
+
+    const root = document.documentElement;
+    const body = document.body;
+    const header = document.getElementById("header");
+    const title = document.getElementById("title");
+    const subtitle = document.getElementById("subtitle");
+    const countdown = document.getElementById("countdown");
+    const status = document.getElementById("status");
+
+    const parseBoolean = (value, fallback) => {
+      if (value === "" || value == null) return fallback;
+      if (["1", "true", "yes", "on"].includes(String(value).toLowerCase())) return true;
+      if (["0", "false", "no", "off"].includes(String(value).toLowerCase())) return false;
+      return fallback;
+    };
+
+    const applyVar = (name, value, formatter = (input) => input) => {
+      if (!value) return;
+      root.style.setProperty(name, formatter(value));
+    };
+
+    const safeLabels = () => {
+      if (config.labels) {
+        const custom = config.labels.split("|").map((item) => item.trim()).filter(Boolean);
+        if (custom.length === 4) {
+          return custom;
+        }
+      }
+      return LABELS[config.lang] || LABELS.sv;
+    };
+
+    const setText = (node, value) => {
+      if (!value) return;
+      node.textContent = value;
+      node.classList.remove("hidden");
+    };
+
+    const normalizeTheme = (value) => {
+      const allowed = ["soft", "glass", "midnight", "minimal"];
+      return allowed.includes(value) ? value : "soft";
+    };
+
+    body.dataset.theme = normalizeTheme(config.theme);
+
+    if (config.image) {
+      root.style.setProperty("--image-url", 'url("' + config.image.replace(/"/g, '\\"') + '")');
+      body.dataset.hasImage = "true";
+    }
+
+    applyVar("--accent", config.accent);
+    applyVar("--card-bg", config.card);
+    applyVar("--card-border", config.cardBorder);
+    applyVar("--label-color", config.label);
+    applyVar("--separator-color", config.separator);
+    applyVar("--title-color", config.titleColor);
+    applyVar("--page-bg", config.background);
+    applyVar("--radius", config.radius, (value) => value + "px");
+    applyVar("--countdown-gap", config.gap, (value) => value + "px");
+    applyVar("--digit-gap", config.digitGap, (value) => value + "px");
+    applyVar("--panel-max-width", config.width, (value) => value + "px");
+    applyVar("--digit-width", config.digitWidth, (value) => value + "px");
+    applyVar("--digit-height", config.digitHeight, (value) => value + "px");
+    applyVar("--digit-font-size", config.digitFont, (value) => value + "px");
+    applyVar("--panel-bg", config.panelBg);
+    applyVar("--panel-border", config.panelBorder);
+    applyVar("--panel-shadow", config.panelShadow);
+    applyVar("--title-font-size", config.titleSize, (value) => value + "px");
+    applyVar("--label-font-size", config.labelSize, (value) => value + "px");
+    applyVar("--panel-padding", config.padding, (value) => value + "px");
+
+    if (config.height) {
+      document.body.style.minHeight = config.height + "px";
+    }
+
+    setText(title, config.title);
+    setText(subtitle, config.subtitle);
+    if (title.textContent || subtitle.textContent) {
+      header.classList.remove("hidden");
+    }
+
+    const labels = safeLabels();
+    const showLabels = parseBoolean(config.showLabels, true);
+    const showSeparators = parseBoolean(config.showSeparators, true);
+    const daysDigits = Math.max(1, Number.parseInt(config.daysDigits, 10) || 3);
+    const targetDate = new Date(config.target);
+
+    const formatDigits = (value, minimumDigits) => {
+      const digits = String(value).padStart(minimumDigits, "0");
+      return digits.split("").map((digit) => '<div class="digit">' + digit + "</div>").join("");
+    };
+
+    const unitTemplate = (value, minimumDigits, labelText) => {
+      return [
+        '<div class="unit">',
+        '  <div class="digits">' + formatDigits(value, minimumDigits) + "</div>",
+        showLabels ? '  <div class="label">' + labelText + "</div>" : "",
+        "</div>"
+      ].join("");
+    };
+
+    const separatorTemplate = () => '<div class="separator" aria-hidden="true">:</div>';
+
+    const renderCountdown = (remaining) => {
+      const parts = [
+        unitTemplate(remaining.days, Math.max(daysDigits, String(remaining.days).length), labels[0]),
+        unitTemplate(remaining.hours, 2, labels[1]),
+        unitTemplate(remaining.minutes, 2, labels[2]),
+        unitTemplate(remaining.seconds, 2, labels[3])
+      ];
+
+      countdown.innerHTML = parts
+        .map((part, index) => {
+          if (!showSeparators || index === parts.length - 1) return part;
+          return part + separatorTemplate();
+        })
+        .join("");
+    };
+
+    const getRemaining = () => {
+      const diff = Math.max(targetDate.getTime() - Date.now(), 0);
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      return { diff, days, hours, minutes, seconds };
+    };
+
+    const invalidDate = Number.isNaN(targetDate.getTime());
+
+    if (invalidDate) {
+      countdown.innerHTML = '<div class="status">Ogiltigt datum. Ange till exempel 2026-12-31T23:59:59+01:00</div>';
+    } else {
+      const update = () => {
+        const remaining = getRemaining();
+        renderCountdown(remaining);
+
+        if (remaining.diff <= 0) {
+          status.textContent = config.endText;
+          status.classList.remove("hidden");
+        }
+      };
+
+      update();
+      window.setInterval(update, 1000);
+    }
+  </script>
+</body>
+</html>
