@@ -66,7 +66,9 @@ Vanliga parametrar:
 - `cardBorder` - valfri avancerad CSS-override for kortkanten, till exempel `rgba(255,255,255,0.56)`
 - `label` - textfarg for enhetsnamnen
 - `separator` - farg pa kolon
-- `background` - egen CSS-bakgrund eller gradient
+- `backgroundColor` - bakgrundens basfarg, till exempel `#3a4031`
+- `backgroundOpacity` - bakgrundens transparens i procent, till exempel `100`
+- `background` - valfri avancerad CSS-override for hela bakgrunden, till exempel `linear-gradient(...)`
 - `image` - bakgrundsbildens URL
 - `radius` - kortens rundning i pixlar
 - `gap` - avstand mellan blocken i pixlar
