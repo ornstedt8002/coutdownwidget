@@ -54,7 +54,7 @@ countdown-widget.html?target=2026-12-31T23:59:59+01:00&theme=soft&accent=%23b7c4
 Vanliga parametrar:
 
 - `target` - datum och tid i ISO-format med offset, exempel `2026-12-31T23:59:59+01:00`
-- `theme` - `soft`, `glass`, `midnight`, `minimal`
+- `theme` - `soft`, `glass`, `midnight`, `minimal`, `luxe`, `aurora`, `ember`
 - `title` - rubrik ovanfor widgeten
 - `subtitle` - underrubrik ovanfor widgeten
 - `accent` - siffrornas farg
