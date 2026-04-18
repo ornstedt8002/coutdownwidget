@@ -410,8 +410,22 @@
           <input type="url" id="image" placeholder="https://din-sajt.se/bakgrund.jpg">
         </label>
 
+        <div class="split">
+          <label>
+            Bakgrundsfarg
+            <input type="color" id="backgroundColor">
+          </label>
+          <label>
+            Bakgrundens transparens
+            <div class="range-row">
+              <input type="range" id="backgroundOpacity" min="0" max="100" value="100">
+              <div class="range-value" id="backgroundOpacityValue">100 %</div>
+            </div>
+          </label>
+        </div>
+
         <label>
-          Bakgrundsgradient / farg (valfritt)
+          Bakgrund (avancerad CSS, valfritt)
           <input type="text" id="background" placeholder="linear-gradient(135deg, #304030, #7e6758)">
         </label>
 
@@ -549,6 +563,8 @@
         cardBorder: "",
         label: "#ffffff",
         separator: "#ffffff",
+        backgroundColor: "#3a4031",
+        backgroundOpacity: 100,
         background: "linear-gradient(135deg, rgba(41,46,36,0.82), rgba(89,70,55,0.68)), radial-gradient(circle at 12% 18%, rgba(189,210,168,0.26), transparent 34%), radial-gradient(circle at 88% 22%, rgba(247,232,215,0.22), transparent 30%), linear-gradient(140deg, #3a4031, #564337 58%, #2f3229)",
         radius: 10,
         gap: 20
@@ -563,6 +579,8 @@
         cardBorder: "",
         label: "#ffffff",
         separator: "#ffffff",
+        backgroundColor: "#173140",
+        backgroundOpacity: 100,
         background: "linear-gradient(140deg, rgba(17,39,55,0.9), rgba(62,86,109,0.8)), radial-gradient(circle at 20% 20%, rgba(127,205,255,0.2), transparent 28%), radial-gradient(circle at 80% 20%, rgba(224,255,255,0.16), transparent 24%), linear-gradient(130deg, #173140, #214357 48%, #102738)",
         radius: 18,
         gap: 18
@@ -577,6 +595,8 @@
         cardBorder: "",
         label: "#f4f6f8",
         separator: "#f8d47b",
+        backgroundColor: "#0f172a",
+        backgroundOpacity: 100,
         background: "radial-gradient(circle at 50% 0%, rgba(248,212,123,0.1), transparent 26%), linear-gradient(140deg, #050912, #0f172a 55%, #111827)",
         radius: 14,
         gap: 18
@@ -591,6 +611,8 @@
         cardBorder: "",
         label: "#223032",
         separator: "#223032",
+        backgroundColor: "#eef4f0",
+        backgroundOpacity: 100,
         background: "radial-gradient(circle at top right, rgba(215,224,216,0.9), transparent 25%), linear-gradient(135deg, #f5f1eb, #e4ece5 56%, #eef4f0)",
         radius: 18,
         gap: 16
@@ -609,7 +631,7 @@
 
     const ids = [
       "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
-      "card", "cardColor", "cardOpacity", "cardBorder", "cardBorderColor", "cardBorderOpacity", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
+      "card", "cardColor", "cardOpacity", "cardBorder", "cardBorderColor", "cardBorderOpacity", "label", "separator", "image", "backgroundColor", "backgroundOpacity", "background", "hostUrl", "radius", "gap",
       "width", "height", "showLabels", "showSeparators", "publishRepo", "publishBranch", "publishPath",
       "publishMessage", "githubToken"
     ];
@@ -622,7 +644,8 @@
       width: document.getElementById("widthValue"),
       height: document.getElementById("heightValue"),
       cardOpacity: document.getElementById("cardOpacityValue"),
-      cardBorderOpacity: document.getElementById("cardBorderOpacityValue")
+      cardBorderOpacity: document.getElementById("cardBorderOpacityValue"),
+      backgroundOpacity: document.getElementById("backgroundOpacityValue")
     };
 
     const persistPublishSettings = () => {
@@ -718,6 +741,8 @@
       controls.cardBorder.value = preset.cardBorder;
       controls.label.value = preset.label;
       controls.separator.value = preset.separator;
+      controls.backgroundColor.value = preset.backgroundColor;
+      controls.backgroundOpacity.value = String(preset.backgroundOpacity);
       controls.background.value = preset.background;
       controls.radius.value = String(preset.radius);
       controls.gap.value = String(preset.gap);
@@ -731,6 +756,7 @@
       rangeMap.height.textContent = controls.height.value + " px";
       rangeMap.cardOpacity.textContent = controls.cardOpacity.value + " %";
       rangeMap.cardBorderOpacity.textContent = controls.cardBorderOpacity.value + " %";
+      rangeMap.backgroundOpacity.textContent = controls.backgroundOpacity.value + " %";
     };
 
     const buildTarget = () => {
@@ -771,6 +797,8 @@
       addConfigValue(payload, "label", controls.label.value);
       addConfigValue(payload, "separator", controls.separator.value);
       addConfigValue(payload, "image", controls.image.value.trim());
+      addConfigValue(payload, "backgroundColor", controls.backgroundColor.value);
+      addConfigValue(payload, "backgroundOpacity", controls.backgroundOpacity.value);
       addConfigValue(payload, "background", controls.background.value.trim());
 
       return payload;
