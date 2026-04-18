@@ -319,7 +319,6 @@
       }
     }
 
-    const root = document.documentElement;
     const body = document.body;
     const header = document.getElementById("header");
     const title = document.getElementById("title");
@@ -336,7 +335,7 @@
 
     const applyVar = (name, value, formatter = (input) => input) => {
       if (!value) return;
-      root.style.setProperty(name, formatter(value));
+      body.style.setProperty(name, formatter(value));
     };
 
     const hexToRgb = (value) => {
@@ -376,7 +375,7 @@
     body.dataset.theme = normalizeTheme(config.theme);
 
     if (config.image) {
-      root.style.setProperty("--image-url", 'url("' + config.image.replace(/"/g, '\\"') + '")');
+      body.style.setProperty("--image-url", 'url("' + config.image.replace(/"/g, '\\"') + '")');
       body.dataset.hasImage = "true";
     }
 
@@ -385,7 +384,7 @@
       const rgb = hexToRgb(config.cardColor);
       const opacity = Math.min(100, Math.max(0, Number.parseInt(config.cardOpacity || "100", 10))) / 100;
       if (rgb) {
-        root.style.setProperty("--card-bg", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
+        body.style.setProperty("--card-bg", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
       }
     }
     applyVar("--card-bg", config.card);
