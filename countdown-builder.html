@@ -800,6 +800,16 @@
       updateRangeLabels();
     };
 
+    const bindSimpleOverride = (simpleIds, advancedId) => {
+      for (const simpleId of simpleIds) {
+        controls[simpleId].addEventListener("input", () => {
+          if (controls[advancedId].value.trim()) {
+            controls[advancedId].value = "";
+          }
+        });
+      }
+    };
+
     const updateRangeLabels = () => {
       rangeMap.radius.textContent = controls.radius.value + " px";
       rangeMap.gap.textContent = controls.gap.value + " px";
@@ -1003,6 +1013,10 @@
       applyThemePreset(event.target.value);
       updateOutput();
     });
+
+    bindSimpleOverride(["cardColor", "cardOpacity"], "card");
+    bindSimpleOverride(["cardBorderColor", "cardBorderOpacity"], "cardBorder");
+    bindSimpleOverride(["backgroundColor", "backgroundOpacity"], "background");
 
     for (const key of ["publishRepo", "publishBranch", "publishPath", "publishMessage"]) {
       controls[key].addEventListener("input", () => {
