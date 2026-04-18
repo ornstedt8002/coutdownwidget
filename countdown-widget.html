@@ -293,6 +293,8 @@
       label: "",
       separator: "",
       titleColor: "",
+      backgroundColor: "",
+      backgroundOpacity: "",
       background: "",
       image: "",
       radius: "",
@@ -467,6 +469,13 @@
       applyVar("--label-color", config.label);
       applyVar("--separator-color", config.separator);
       applyVar("--title-color", config.titleColor);
+      if (config.backgroundColor) {
+        const rgb = hexToRgb(String(config.backgroundColor));
+        const opacity = Math.min(100, Math.max(0, Number.parseInt(config.backgroundOpacity || "100", 10))) / 100;
+        if (rgb) {
+          body.style.setProperty("--page-bg", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
+        }
+      }
       applyVar("--page-bg", config.background);
       applyVar("--radius", config.radius, (value) => value + "px");
       applyVar("--countdown-gap", config.gap, (value) => value + "px");
