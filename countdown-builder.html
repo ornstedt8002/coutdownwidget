@@ -223,6 +223,37 @@
       font-size: 0.9rem;
     }
 
+    .publish-box {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(57, 75, 60, 0.12);
+    }
+
+    .status-box {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(57, 75, 60, 0.08);
+      color: var(--muted);
+    }
+
+    .status-box[data-tone="success"] {
+      background: rgba(77, 122, 77, 0.14);
+      color: #2d5a35;
+    }
+
+    .status-box[data-tone="error"] {
+      background: rgba(165, 62, 62, 0.12);
+      color: #8a2d2d;
+    }
+
+    .status-box[data-tone="busy"] {
+      background: rgba(82, 98, 146, 0.12);
+      color: #3a4a77;
+    }
+
     .hint {
       font-size: 0.86rem;
       color: var(--muted);
@@ -438,7 +469,7 @@
       <div class="preview-head">
         <div class="preview-title">
           <strong>Forhandsvisning</strong>
-          <span class="hint">Byggaren laddar den riktiga widgeten i en iframe sa att resultatet matchar den inbaddade versionen.</span>
+          <span class="hint">Forhandsvisningen visar dina senaste andringar direkt. Den inbaddade Google Sites-widgeten uppdateras nar du publicerar konfigurationen.</span>
         </div>
         <div class="button-row">
           <button type="button" id="copyUrl">Kopiera widget-URL</button>
@@ -450,7 +481,7 @@
 
       <div class="code-box">
         <label>
-          Widget-URL
+          Publicerad widget-URL
           <textarea id="widgetUrl" readonly></textarea>
         </label>
       </div>
@@ -461,6 +492,46 @@
           <textarea id="iframeCode" readonly></textarea>
         </label>
       </div>
+
+      <section class="publish-box">
+        <div class="preview-title">
+          <strong>Publicera</strong>
+          <span class="hint">Publicera en stabil JSON-konfiguration till GitHub. Det ar den fasta URL:en ovan du sedan baddar in i Google Sites.</span>
+        </div>
+
+        <div class="split">
+          <label>
+            GitHub-repo
+            <input type="text" id="publishRepo" placeholder="ornstedt8002/coutdownwidget">
+          </label>
+          <label>
+            Branch
+            <input type="text" id="publishBranch" placeholder="main">
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
+            Konfigurationsfil
+            <input type="text" id="publishPath" placeholder="published/default.json">
+          </label>
+          <label>
+            Commitmeddelande
+            <input type="text" id="publishMessage" placeholder="Update countdown widget configuration">
+          </label>
+        </div>
+
+        <label>
+          GitHub-token
+          <input type="password" id="githubToken" placeholder="Fine-grained token med Contents: Read and write">
+        </label>
+
+        <div class="button-row">
+          <button type="button" id="publishConfig">Publicera till GitHub</button>
+        </div>
+
+        <div class="status-box hint" id="publishStatus">Token sparas inte i sidan. Byggaren publicerar en JSON-fil som widgeten laser in via samma GitHub Pages-host.</div>
+      </section>
 
       <p class="hint">Tips: I Google Sites fungerar oftast "Badda in via URL" bast. Om sidan kor pa GitHub Pages fylls hostad URL i automatiskt.</p>
     </section>
@@ -526,17 +597,21 @@
       }
     };
 
+    const STORAGE_KEY = "countdown-builder-publish-settings-v2";
     const form = document.getElementById("form");
     const previewFrame = document.getElementById("previewFrame");
     const widgetUrl = document.getElementById("widgetUrl");
     const iframeCode = document.getElementById("iframeCode");
     const copyUrl = document.getElementById("copyUrl");
     const copyIframe = document.getElementById("copyIframe");
+    const publishConfig = document.getElementById("publishConfig");
+    const publishStatus = document.getElementById("publishStatus");
 
     const ids = [
       "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
       "card", "cardColor", "cardOpacity", "cardBorder", "cardBorderColor", "cardBorderOpacity", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
-      "width", "height", "showLabels", "showSeparators"
+      "width", "height", "showLabels", "showSeparators", "publishRepo", "publishBranch", "publishPath",
+      "publishMessage", "githubToken"
     ];
 
     const controls = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
@@ -548,6 +623,39 @@
       height: document.getElementById("heightValue"),
       cardOpacity: document.getElementById("cardOpacityValue"),
       cardBorderOpacity: document.getElementById("cardBorderOpacityValue")
+    };
+
+    const persistPublishSettings = () => {
+      const payload = {
+        publishRepo: controls.publishRepo.value.trim(),
+        publishBranch: controls.publishBranch.value.trim(),
+        publishPath: controls.publishPath.value.trim(),
+        publishMessage: controls.publishMessage.value.trim()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    };
+
+    const restorePublishSettings = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        controls.publishRepo.value = saved.publishRepo || "";
+        controls.publishBranch.value = saved.publishBranch || "";
+        controls.publishPath.value = saved.publishPath || "";
+        controls.publishMessage.value = saved.publishMessage || "";
+      } catch (error) {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    };
+
+    const setPublishStatus = (message, tone = "") => {
+      publishStatus.textContent = message;
+      if (tone) {
+        publishStatus.dataset.tone = tone;
+      } else {
+        delete publishStatus.dataset.tone;
+      }
     };
 
     const now = new Date();
@@ -567,6 +675,9 @@
     controls.daysDigits.value = "3";
     controls.width.value = "1240";
     controls.height.value = "260";
+    controls.publishBranch.value = "main";
+    controls.publishPath.value = "published/default.json";
+    controls.publishMessage.value = "Update countdown widget configuration";
 
     const detectBaseUrl = () => {
       const { protocol, origin, pathname } = window.location;
@@ -577,7 +688,23 @@
       return origin + normalizedPath;
     };
 
+    const detectRepoFromHost = (value) => {
+      try {
+        const url = new URL(value);
+        const match = url.hostname.match(/^([^.]+)\.github\.io$/);
+        const path = url.pathname.replace(/^\/+|\/+$/g, "");
+        if (!match || !path) return "";
+        return match[1] + "/" + path;
+      } catch (error) {
+        return "";
+      }
+    };
+
     controls.hostUrl.value = detectBaseUrl();
+    restorePublishSettings();
+    if (!controls.publishRepo.value) {
+      controls.publishRepo.value = detectRepoFromHost(controls.hostUrl.value);
+    }
 
     const applyThemePreset = (theme) => {
       const preset = themePresets[theme];
@@ -613,49 +740,75 @@
       return date + "T" + time + offset;
     };
 
-    const buildParams = () => {
+    const addConfigValue = (payload, key, value) => {
+      if (value === "" || value == null) return;
+      payload[key] = value;
+    };
+
+    const buildConfigObject = () => {
+      const payload = {
+        target: buildTarget(),
+        theme: controls.theme.value,
+        lang: controls.lang.value,
+        daysDigits: controls.daysDigits.value,
+        showLabels: controls.showLabels.checked,
+        showSeparators: controls.showSeparators.checked,
+        radius: controls.radius.value,
+        gap: controls.gap.value,
+        width: controls.width.value,
+        height: controls.height.value
+      };
+
+      addConfigValue(payload, "title", controls.title.value.trim());
+      addConfigValue(payload, "subtitle", controls.subtitle.value.trim());
+      addConfigValue(payload, "accent", controls.accent.value);
+      addConfigValue(payload, "cardColor", controls.cardColor.value);
+      addConfigValue(payload, "cardOpacity", controls.cardOpacity.value);
+      addConfigValue(payload, "card", controls.card.value.trim());
+      addConfigValue(payload, "cardBorderColor", controls.cardBorderColor.value);
+      addConfigValue(payload, "cardBorderOpacity", controls.cardBorderOpacity.value);
+      addConfigValue(payload, "cardBorder", controls.cardBorder.value.trim());
+      addConfigValue(payload, "label", controls.label.value);
+      addConfigValue(payload, "separator", controls.separator.value);
+      addConfigValue(payload, "image", controls.image.value.trim());
+      addConfigValue(payload, "background", controls.background.value.trim());
+
+      return payload;
+    };
+
+    const buildQuery = (payload) => {
       const query = new URLSearchParams();
-      query.set("target", buildTarget());
-      query.set("theme", controls.theme.value);
-      query.set("lang", controls.lang.value);
-      query.set("daysDigits", controls.daysDigits.value);
-      query.set("showLabels", String(controls.showLabels.checked));
-      query.set("showSeparators", String(controls.showSeparators.checked));
-      query.set("radius", controls.radius.value);
-      query.set("gap", controls.gap.value);
-      query.set("width", controls.width.value);
-      query.set("height", controls.height.value);
-
-      if (controls.title.value.trim()) query.set("title", controls.title.value.trim());
-      if (controls.subtitle.value.trim()) query.set("subtitle", controls.subtitle.value.trim());
-      if (controls.accent.value) query.set("accent", controls.accent.value);
-      if (controls.cardColor.value) query.set("cardColor", controls.cardColor.value);
-      if (controls.cardOpacity.value) query.set("cardOpacity", controls.cardOpacity.value);
-      if (controls.card.value) query.set("card", controls.card.value);
-      if (controls.cardBorderColor.value) query.set("cardBorderColor", controls.cardBorderColor.value);
-      if (controls.cardBorderOpacity.value) query.set("cardBorderOpacity", controls.cardBorderOpacity.value);
-      if (controls.cardBorder.value) query.set("cardBorder", controls.cardBorder.value);
-      if (controls.label.value) query.set("label", controls.label.value);
-      if (controls.separator.value) query.set("separator", controls.separator.value);
-      if (controls.image.value.trim()) query.set("image", controls.image.value.trim());
-      if (controls.background.value.trim()) query.set("background", controls.background.value.trim());
-
+      for (const [key, value] of Object.entries(payload)) {
+        if (value === "" || value == null) continue;
+        query.set(key, String(value));
+      }
       return query.toString();
     };
 
     const normalizeHost = (value) => value.replace(/\/+$/, "");
+    const normalizePublishPath = (value) => value.trim().replace(/^\/+/, "");
+    const encodeRepoPath = (value) => value.split("/").map((part) => encodeURIComponent(part)).join("/");
+
+    const buildPublishedWidgetPath = () => {
+      const publishPath = normalizePublishPath(controls.publishPath.value);
+      if (!publishPath) {
+        return "countdown-widget.html?" + buildQuery(buildConfigObject());
+      }
+      return "countdown-widget.html?config=" + encodeURIComponent(publishPath);
+    };
+
+    const buildHostedUrl = (relativePath) => {
+      const host = controls.hostUrl.value.trim();
+      if (!host) return relativePath;
+      return normalizeHost(host) + "/" + relativePath;
+    };
 
     const updateOutput = () => {
-      const params = buildParams();
-      const localPath = "countdown-widget.html?" + params;
-      previewFrame.src = localPath;
+      const livePath = "countdown-widget.html?" + buildQuery(buildConfigObject());
+      previewFrame.src = livePath;
       previewFrame.style.height = String(Math.max(Number(controls.height.value) + 48, 240)) + "px";
 
-      const host = controls.hostUrl.value.trim();
-      const publicUrl = host
-        ? normalizeHost(host) + "/countdown-widget.html?" + params
-        : localPath;
-
+      const publicUrl = buildHostedUrl(buildPublishedWidgetPath());
       widgetUrl.value = publicUrl;
       iframeCode.value = '<iframe src="' + publicUrl + '" width="100%" height="' + controls.height.value + '" style="border:0;" loading="lazy" referrerpolicy="no-referrer"></iframe>';
     };
@@ -668,12 +821,128 @@
       }
     };
 
+    const encodeBase64 = (value) => {
+      const bytes = new TextEncoder().encode(value);
+      let binary = "";
+      for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+      }
+      return btoa(binary);
+    };
+
+    const readGitHubError = async (response) => {
+      try {
+        const payload = await response.json();
+        return payload.message || "GitHub returnerade ett fel.";
+      } catch (error) {
+        return "GitHub returnerade ett fel.";
+      }
+    };
+
+    const publishToGitHub = async () => {
+      const repo = controls.publishRepo.value.trim();
+      const branch = controls.publishBranch.value.trim() || "main";
+      const publishPath = normalizePublishPath(controls.publishPath.value);
+      const token = controls.githubToken.value.trim();
+
+      if (!/^[^/]+\/[^/]+$/.test(repo)) {
+        setPublishStatus("Ange repo i formatet owner/repo.", "error");
+        return;
+      }
+
+      if (!publishPath) {
+        setPublishStatus("Ange en konfigurationsfil, till exempel published/default.json.", "error");
+        return;
+      }
+
+      if (!token) {
+        setPublishStatus("Ange en GitHub-token med Contents: Read and write for repot.", "error");
+        return;
+      }
+
+      const apiUrl = "https://api.github.com/repos/" + repo + "/contents/" + encodeRepoPath(publishPath);
+      const headers = {
+        Accept: "application/vnd.github+json",
+        Authorization: "Bearer " + token,
+        "X-GitHub-Api-Version": "2022-11-28"
+      };
+
+      const payload = {
+        version: 1,
+        updatedAt: new Date().toISOString(),
+        settings: buildConfigObject()
+      };
+
+      publishConfig.disabled = true;
+      setPublishStatus("Publicerar konfiguration till GitHub...", "busy");
+
+      try {
+        let sha = "";
+        const existingResponse = await fetch(apiUrl + "?ref=" + encodeURIComponent(branch), {
+          method: "GET",
+          headers
+        });
+
+        if (existingResponse.ok) {
+          const existingFile = await existingResponse.json();
+          sha = existingFile.sha || "";
+        } else if (existingResponse.status !== 404) {
+          throw new Error(await readGitHubError(existingResponse));
+        }
+
+        const commitMessage = controls.publishMessage.value.trim() || "Update countdown widget configuration";
+        const writeResponse = await fetch(apiUrl, {
+          method: "PUT",
+          headers: {
+            ...headers,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: commitMessage,
+            branch,
+            sha: sha || undefined,
+            content: encodeBase64(JSON.stringify(payload, null, 2) + "\n")
+          })
+        });
+
+        if (!writeResponse.ok) {
+          throw new Error(await readGitHubError(writeResponse));
+        }
+
+        persistPublishSettings();
+        updateOutput();
+        setPublishStatus("Publicerat. Din Google Sites-widget anvander nu samma fasta URL och uppdateras sa fort GitHub Pages har levererat den nya JSON-filen.", "success");
+      } catch (error) {
+        setPublishStatus("Publicering misslyckades: " + error.message, "error");
+      } finally {
+        publishConfig.disabled = false;
+      }
+    };
+
     form.addEventListener("input", updateOutput);
     controls.theme.addEventListener("change", (event) => {
       applyThemePreset(event.target.value);
       updateOutput();
     });
 
+    for (const key of ["publishRepo", "publishBranch", "publishPath", "publishMessage"]) {
+      controls[key].addEventListener("input", () => {
+        if (key === "publishRepo" || key === "publishBranch" || key === "publishPath") {
+          updateOutput();
+        }
+        persistPublishSettings();
+      });
+    }
+
+    controls.hostUrl.addEventListener("input", () => {
+      if (!controls.publishRepo.value.trim()) {
+        controls.publishRepo.value = detectRepoFromHost(controls.hostUrl.value);
+      }
+      updateOutput();
+      persistPublishSettings();
+    });
+
+    publishConfig.addEventListener("click", publishToGitHub);
     copyUrl.addEventListener("click", () => copyText(widgetUrl.value));
     copyIframe.addEventListener("click", () => copyText(iframeCode.value));
 
