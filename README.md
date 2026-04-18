@@ -44,7 +44,9 @@ Vanliga parametrar:
 - `title` - rubrik ovanfor widgeten
 - `subtitle` - underrubrik ovanfor widgeten
 - `accent` - siffrornas farg
-- `card` - kortens bakgrund, till exempel `#ffffff`, `rgba(255,255,255,0.16)` eller `linear-gradient(...)`
+- `cardColor` - kortens basfarg, till exempel `#ffffff`
+- `cardOpacity` - kortens transparens i procent, till exempel `95`
+- `card` - valfri avancerad CSS-override for kortens bakgrund, till exempel `linear-gradient(...)`
 - `label` - textfarg for enhetsnamnen
 - `separator` - farg pa kolon
 - `background` - egen CSS-bakgrund eller gradient
