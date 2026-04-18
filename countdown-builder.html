@@ -291,7 +291,7 @@
 
         <label>
           Rubrik (valfritt)
-          <input type="text" id="title" placeholder="Till bröllopet">
+          <input type="text" id="title" placeholder="Till brollopet">
         </label>
 
         <label>
@@ -337,10 +337,23 @@
             <input type="color" id="separator">
           </label>
           <label>
-            Kortbakgrund (CSS)
-            <input type="text" id="card" placeholder="rgba(255,255,255,0.95)">
+            Kortbakgrund
+            <input type="color" id="cardColor">
           </label>
         </div>
+
+        <label>
+          Kortbakgrundens transparens
+          <div class="range-row">
+            <input type="range" id="cardOpacity" min="0" max="100" value="95">
+            <div class="range-value" id="cardOpacityValue">95 %</div>
+          </div>
+        </label>
+
+        <label>
+          Kortbakgrund (avancerad CSS, valfritt)
+          <input type="text" id="card" placeholder="linear-gradient(...)">
+        </label>
 
         <label>
           Bakgrundsbild-URL (valfritt)
@@ -354,7 +367,7 @@
 
         <label>
           Hostad bas-URL
-          <input type="url" id="hostUrl" placeholder="https://din-domän.se/widgets">
+          <input type="url" id="hostUrl" placeholder="https://din-doman.se/widgets">
         </label>
 
         <div class="section-title">Storlek</div>
@@ -438,7 +451,9 @@
     const themePresets = {
       soft: {
         accent: "#b7c49f",
-        card: "rgba(255, 255, 255, 0.95)",
+        cardColor: "#ffffff",
+        cardOpacity: 95,
+        card: "",
         label: "#ffffff",
         separator: "#ffffff",
         background: "linear-gradient(135deg, rgba(41,46,36,0.82), rgba(89,70,55,0.68)), radial-gradient(circle at 12% 18%, rgba(189,210,168,0.26), transparent 34%), radial-gradient(circle at 88% 22%, rgba(247,232,215,0.22), transparent 30%), linear-gradient(140deg, #3a4031, #564337 58%, #2f3229)",
@@ -447,7 +462,9 @@
       },
       glass: {
         accent: "#ffffff",
-        card: "rgba(255, 255, 255, 0.16)",
+        cardColor: "#ffffff",
+        cardOpacity: 16,
+        card: "",
         label: "#ffffff",
         separator: "#ffffff",
         background: "linear-gradient(140deg, rgba(17,39,55,0.9), rgba(62,86,109,0.8)), radial-gradient(circle at 20% 20%, rgba(127,205,255,0.2), transparent 28%), radial-gradient(circle at 80% 20%, rgba(224,255,255,0.16), transparent 24%), linear-gradient(130deg, #173140, #214357 48%, #102738)",
@@ -456,7 +473,9 @@
       },
       midnight: {
         accent: "#f8d47b",
-        card: "linear-gradient(180deg, #1a2333, #111827)",
+        cardColor: "#162033",
+        cardOpacity: 100,
+        card: "",
         label: "#f4f6f8",
         separator: "#f8d47b",
         background: "radial-gradient(circle at 50% 0%, rgba(248,212,123,0.1), transparent 26%), linear-gradient(140deg, #050912, #0f172a 55%, #111827)",
@@ -465,7 +484,9 @@
       },
       minimal: {
         accent: "#223032",
-        card: "rgba(255, 255, 255, 0.7)",
+        cardColor: "#ffffff",
+        cardOpacity: 70,
+        card: "",
         label: "#223032",
         separator: "#223032",
         background: "radial-gradient(circle at top right, rgba(215,224,216,0.9), transparent 25%), linear-gradient(135deg, #f5f1eb, #e4ece5 56%, #eef4f0)",
@@ -483,7 +504,7 @@
 
     const ids = [
       "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
-      "card", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
+      "card", "cardColor", "cardOpacity", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
       "width", "height", "showLabels", "showSeparators"
     ];
 
@@ -493,7 +514,8 @@
       radius: document.getElementById("radiusValue"),
       gap: document.getElementById("gapValue"),
       width: document.getElementById("widthValue"),
-      height: document.getElementById("heightValue")
+      height: document.getElementById("heightValue"),
+      cardOpacity: document.getElementById("cardOpacityValue")
     };
 
     const now = new Date();
@@ -529,6 +551,8 @@
       const preset = themePresets[theme];
       if (!preset) return;
       controls.accent.value = preset.accent;
+      controls.cardColor.value = preset.cardColor;
+      controls.cardOpacity.value = String(preset.cardOpacity);
       controls.card.value = preset.card;
       controls.label.value = preset.label;
       controls.separator.value = preset.separator;
@@ -543,6 +567,7 @@
       rangeMap.gap.textContent = controls.gap.value + " px";
       rangeMap.width.textContent = controls.width.value + " px";
       rangeMap.height.textContent = controls.height.value + " px";
+      rangeMap.cardOpacity.textContent = controls.cardOpacity.value + " %";
     };
 
     const buildTarget = () => {
@@ -568,6 +593,8 @@
       if (controls.title.value.trim()) query.set("title", controls.title.value.trim());
       if (controls.subtitle.value.trim()) query.set("subtitle", controls.subtitle.value.trim());
       if (controls.accent.value) query.set("accent", controls.accent.value);
+      if (controls.cardColor.value) query.set("cardColor", controls.cardColor.value);
+      if (controls.cardOpacity.value) query.set("cardOpacity", controls.cardOpacity.value);
       if (controls.card.value) query.set("card", controls.card.value);
       if (controls.label.value) query.set("label", controls.label.value);
       if (controls.separator.value) query.set("separator", controls.separator.value);
