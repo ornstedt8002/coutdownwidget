@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-18T12:21:06.808Z",
+  "updatedAt": "2026-04-18T12:23:38.560Z",
   "settings": {
     "target": "2026-05-02T18:00:00+02:00",
     "theme": "soft",
@@ -14,9 +14,9 @@
     "height": "260",
     "accent": "#b7c49f",
     "cardColor": "#ffffff",
-    "cardOpacity": "0",
+    "cardOpacity": "100",
     "cardBorderColor": "#ffffff",
-    "cardBorderOpacity": "56",
+    "cardBorderOpacity": "0",
     "label": "#ffffff",
     "separator": "#ffffff",
     "backgroundColor": "#3a4031",
