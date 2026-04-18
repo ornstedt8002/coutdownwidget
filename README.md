@@ -26,8 +26,22 @@ Byggaren kanner automatiskt av GitHub Pages-adressen och fyller i `Hostad bas-UR
 2. Oppna `index.html` eller `countdown-builder.html`.
 3. Valj datum, tid, UTC-offset, tema och farger.
 4. Kontrollera `Hostad bas-URL`. Pa GitHub Pages fylls den normalt i automatiskt, till exempel `https://anvandarnamn.github.io/repo-namn`.
-5. Kopiera `Widget-URL` eller `Iframe-kod`.
-6. I Google Sites valjer du `Infoga > Badda in` och klistrar in URL:en.
+5. Fyll i `GitHub-repo`, `Branch`, `Konfigurationsfil` och en GitHub-token i byggarens publiceringsdel.
+6. Klicka `Publicera till GitHub`.
+7. Kopiera den `Publicerad widget-URL` eller `Iframe-kod` som byggaren visar.
+8. I Google Sites valjer du `Infoga > Badda in` och klistrar in URL:en.
+
+## Publicering fran byggaren
+
+Byggaren kan nu publicera en JSON-konfiguration direkt till ditt GitHub-repo. Den inbaddade widgeten pa Google Sites pekar da pa en fast URL i stil med:
+
+```text
+countdown-widget.html?config=published/default.json
+```
+
+Det betyder att du kan behalla samma inbaddade URL i Google Sites och bara publicera om konfigurationen nar du vill uppdatera design, datum eller farger.
+
+For att publicering ska fungera behovs en GitHub-token med `Contents: Read and write` for repot. Ett bra val ar en fine-grained personal access token som bara har access till just detta repo.
 
 ## Viktiga parametrar
 
@@ -59,6 +73,7 @@ Vanliga parametrar:
 - `daysDigits` - minsta antal siffror for dagar
 - `showLabels` - `true` eller `false`
 - `showSeparators` - `true` eller `false`
+- `config` - sokvag eller URL till en publicerad JSON-konfiguration, till exempel `published/default.json`
 
 ## Designutgangspunkt
 
