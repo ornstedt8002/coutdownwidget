@@ -285,6 +285,8 @@
       showSeparators: true,
       accent: "",
       card: "",
+      cardColor: "",
+      cardOpacity: "",
       cardBorder: "",
       label: "",
       separator: "",
@@ -337,6 +339,19 @@
       root.style.setProperty(name, formatter(value));
     };
 
+    const hexToRgb = (value) => {
+      if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) return null;
+      const normalized = value.length === 4
+        ? "#" + value.slice(1).split("").map((char) => char + char).join("")
+        : value;
+      const intValue = Number.parseInt(normalized.slice(1), 16);
+      return {
+        r: (intValue >> 16) & 255,
+        g: (intValue >> 8) & 255,
+        b: intValue & 255
+      };
+    };
+
     const safeLabels = () => {
       if (config.labels) {
         const custom = config.labels.split("|").map((item) => item.trim()).filter(Boolean);
@@ -366,6 +381,13 @@
     }
 
     applyVar("--accent", config.accent);
+    if (config.cardColor) {
+      const rgb = hexToRgb(config.cardColor);
+      const opacity = Math.min(100, Math.max(0, Number.parseInt(config.cardOpacity || "100", 10))) / 100;
+      if (rgb) {
+        root.style.setProperty("--card-bg", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
+      }
+    }
     applyVar("--card-bg", config.card);
     applyVar("--card-border", config.cardBorder);
     applyVar("--label-color", config.label);
