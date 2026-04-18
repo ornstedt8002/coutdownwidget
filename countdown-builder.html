@@ -206,10 +206,14 @@
 
     iframe {
       width: 100%;
-      height: 308px;
+      height: 170px;
       border: none;
       border-radius: 22px;
-      background: rgba(255, 255, 255, 0.4);
+      background:
+        linear-gradient(45deg, rgba(107, 124, 87, 0.05) 25%, transparent 25%, transparent 75%, rgba(107, 124, 87, 0.05) 75%),
+        linear-gradient(45deg, rgba(107, 124, 87, 0.05) 25%, transparent 25%, transparent 75%, rgba(107, 124, 87, 0.05) 75%);
+      background-position: 0 0, 12px 12px;
+      background-size: 24px 24px;
     }
 
     .code-box {
@@ -457,7 +461,7 @@
         <label>
           Widgetbredd
           <div class="range-row">
-            <input type="range" id="width" min="760" max="1400" value="1240">
+            <input type="range" id="width" min="520" max="1400" value="940">
             <div class="range-value" id="widthValue">1240 px</div>
           </div>
         </label>
@@ -465,7 +469,7 @@
         <label>
           Widgethojd
           <div class="range-row">
-            <input type="range" id="height" min="180" max="420" value="260">
+            <input type="range" id="height" min="110" max="420" value="150">
             <div class="range-value" id="heightValue">260 px</div>
           </div>
         </label>
@@ -479,6 +483,11 @@
           <input type="checkbox" id="showSeparators" checked>
           Visa kolon mellan blocken
         </label>
+
+        <label class="checkbox">
+          <input type="checkbox" id="flip">
+          Aktivera flip-animation
+        </label>
       </form>
     </section>
 
@@ -486,7 +495,7 @@
       <div class="preview-head">
         <div class="preview-title">
           <strong>Forhandsvisning</strong>
-          <span class="hint">Forhandsvisningen visar dina senaste andringar direkt. Den inbaddade Google Sites-widgeten uppdateras nar du publicerar konfigurationen.</span>
+          <span class="hint">Forhandsvisningen visar dina senaste andringar direkt. Google Sites uppdateras forst nar du klickar Publicera till GitHub.</span>
         </div>
         <div class="button-row">
           <button type="button" id="copyUrl">Kopiera widget-URL</button>
@@ -498,7 +507,7 @@
 
       <div class="code-box">
         <label>
-          Publicerad widget-URL
+          Publicerad widget-URL for Google Sites
           <textarea id="widgetUrl" readonly></textarea>
         </label>
       </div>
@@ -547,7 +556,7 @@
           <button type="button" id="publishConfig">Publicera till GitHub</button>
         </div>
 
-        <div class="status-box hint" id="publishStatus">Token sparas inte i sidan. Byggaren publicerar en JSON-fil som widgeten laser in via samma GitHub Pages-host.</div>
+        <div class="status-box hint" id="publishStatus">Token sparas inte i sidan. Google Sites anvander den publicerade URL:en ovan, sa andringar i datum, tid och design syns dar forst efter att du klickar Publicera till GitHub.</div>
       </section>
 
       <p class="hint">Tips: I Google Sites fungerar oftast "Badda in via URL" bast. Om sidan kor pa GitHub Pages fylls hostad URL i automatiskt.</p>
@@ -567,8 +576,8 @@
         label: "#ffffff",
         separator: "#ffffff",
         backgroundColor: "#3a4031",
-        backgroundOpacity: 100,
-        background: "linear-gradient(135deg, rgba(41,46,36,0.82), rgba(89,70,55,0.68)), radial-gradient(circle at 12% 18%, rgba(189,210,168,0.26), transparent 34%), radial-gradient(circle at 88% 22%, rgba(247,232,215,0.22), transparent 30%), linear-gradient(140deg, #3a4031, #564337 58%, #2f3229)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 10,
         gap: 20
       },
@@ -583,8 +592,8 @@
         label: "#ffffff",
         separator: "#ffffff",
         backgroundColor: "#173140",
-        backgroundOpacity: 100,
-        background: "linear-gradient(140deg, rgba(17,39,55,0.9), rgba(62,86,109,0.8)), radial-gradient(circle at 20% 20%, rgba(127,205,255,0.2), transparent 28%), radial-gradient(circle at 80% 20%, rgba(224,255,255,0.16), transparent 24%), linear-gradient(130deg, #173140, #214357 48%, #102738)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 18,
         gap: 18
       },
@@ -599,8 +608,8 @@
         label: "#f4f6f8",
         separator: "#f8d47b",
         backgroundColor: "#0f172a",
-        backgroundOpacity: 100,
-        background: "radial-gradient(circle at 50% 0%, rgba(248,212,123,0.1), transparent 26%), linear-gradient(140deg, #050912, #0f172a 55%, #111827)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 14,
         gap: 18
       },
@@ -615,8 +624,8 @@
         label: "#223032",
         separator: "#223032",
         backgroundColor: "#eef4f0",
-        backgroundOpacity: 100,
-        background: "radial-gradient(circle at top right, rgba(215,224,216,0.9), transparent 25%), linear-gradient(135deg, #f5f1eb, #e4ece5 56%, #eef4f0)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 18,
         gap: 16
       },
@@ -631,8 +640,8 @@
         label: "#fff7eb",
         separator: "#f5d8a7",
         backgroundColor: "#5b4330",
-        backgroundOpacity: 100,
-        background: "radial-gradient(circle at 16% 18%, rgba(255,233,190,0.16), transparent 26%), radial-gradient(circle at 82% 20%, rgba(255,248,228,0.14), transparent 22%), linear-gradient(145deg, #3d2c23, #6b4d39 56%, #2c211c)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 16,
         gap: 18
       },
@@ -647,8 +656,8 @@
         label: "#f5ffff",
         separator: "#d7ffff",
         backgroundColor: "#1f5557",
-        backgroundOpacity: 100,
-        background: "radial-gradient(circle at 18% 20%, rgba(197,255,250,0.18), transparent 26%), radial-gradient(circle at 84% 16%, rgba(230,255,255,0.14), transparent 22%), linear-gradient(145deg, #0f2f32, #246366 54%, #142325)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 18,
         gap: 18
       },
@@ -663,8 +672,8 @@
         label: "#fff2e7",
         separator: "#ffc88c",
         backgroundColor: "#251410",
-        backgroundOpacity: 100,
-        background: "radial-gradient(circle at 20% 18%, rgba(255,173,96,0.16), transparent 24%), radial-gradient(circle at 82% 22%, rgba(255,227,193,0.1), transparent 20%), linear-gradient(145deg, #1b0e0c, #4b251d 54%, #10090a)",
+        backgroundOpacity: 0,
+        background: "",
         radius: 16,
         gap: 18
       }
@@ -683,7 +692,7 @@
     const ids = [
       "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
       "card", "cardColor", "cardOpacity", "cardBorder", "cardBorderColor", "cardBorderOpacity", "label", "separator", "image", "backgroundColor", "backgroundOpacity", "background", "hostUrl", "radius", "gap",
-      "width", "height", "showLabels", "showSeparators", "publishRepo", "publishBranch", "publishPath",
+      "width", "height", "showLabels", "showSeparators", "flip", "publishRepo", "publishBranch", "publishPath",
       "publishMessage", "githubToken"
     ];
 
@@ -747,8 +756,9 @@
     controls.theme.value = "soft";
     controls.lang.value = "sv";
     controls.daysDigits.value = "3";
-    controls.width.value = "1240";
-    controls.height.value = "260";
+    controls.width.value = "940";
+    controls.height.value = "150";
+    controls.flip.checked = false;
     controls.publishBranch.value = "main";
     controls.publishPath.value = "published/default.json";
     controls.publishMessage.value = "Update countdown widget configuration";
@@ -840,6 +850,7 @@
         daysDigits: controls.daysDigits.value,
         showLabels: controls.showLabels.checked,
         showSeparators: controls.showSeparators.checked,
+        flip: controls.flip.checked,
         radius: controls.radius.value,
         gap: controls.gap.value,
         width: controls.width.value,
@@ -895,7 +906,7 @@
     const updateOutput = () => {
       const livePath = "countdown-widget.html?" + buildQuery(buildConfigObject());
       previewFrame.src = livePath;
-      previewFrame.style.height = String(Math.max(Number(controls.height.value) + 48, 240)) + "px";
+      previewFrame.style.height = String(Math.max(Number(controls.height.value) + 16, 120)) + "px";
 
       const publicUrl = buildHostedUrl(buildPublishedWidgetPath());
       widgetUrl.value = publicUrl;
@@ -1000,7 +1011,7 @@
 
         persistPublishSettings();
         updateOutput();
-        setPublishStatus("Publicerat. Din Google Sites-widget anvander nu samma fasta URL och uppdateras sa fort GitHub Pages har levererat den nya JSON-filen.", "success");
+        setPublishStatus("Publicerat. Din Google Sites-widget anvander nu samma fasta URL och uppdateras normalt inom cirka 30 sekunder, eller direkt efter en omladdning.", "success");
       } catch (error) {
         setPublishStatus("Publicering misslyckades: " + error.message, "error");
       } finally {
