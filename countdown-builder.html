@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Countdown Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page-bg:
+        linear-gradient(135deg, #f3eadc, #dce7dc 48%, #e9f0ea);
+      --panel-bg: rgba(255, 255, 255, 0.82);
+      --panel-border: rgba(57, 75, 60, 0.1);
+      --panel-shadow: 0 24px 60px rgba(45, 55, 46, 0.12);
+      --text: #25322a;
+      --muted: #617063;
+      --accent: #6b7c57;
+      --accent-strong: #4b5d37;
+      --field-bg: rgba(255, 255, 255, 0.9);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+    }
+
+    body {
+      padding: 26px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(380px, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .controls {
+      padding: 24px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .preview {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 1.05;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .section-title {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(57, 75, 60, 0.16);
+      background: var(--field-bg);
+      color: var(--text);
+    }
+
+    input[type="color"] {
+      padding: 6px;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      min-height: auto;
+      background: transparent;
+      border: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .range-value {
+      min-width: 48px;
+      text-align: right;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .checkbox {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .checkbox input {
+      width: 18px;
+      min-height: 18px;
+      margin: 0;
+    }
+
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .preview-title {
+      display: grid;
+      gap: 6px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 140ms ease, background 140ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: var(--accent-strong);
+    }
+
+    .ghost {
+      background: rgba(107, 124, 87, 0.12);
+      color: var(--accent-strong);
+    }
+
+    iframe {
+      width: 100%;
+      height: 308px;
+      border: none;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .code-box {
+      display: grid;
+      gap: 8px;
+    }
+
+    .code-box textarea {
+      min-height: 100px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .hint {
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 14px;
+      }
+
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-head {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <section class="panel controls">
+      <h1>Countdown Builder</h1>
+      <p>Skapa en Google Sites-widget med samma kortlayout som i din referensbild, men med flera teman och egna farger.</p>
+
+      <form class="grid" id="form">
+        <div class="section-title">Mal</div>
+        <div class="split">
+          <label>
+            Datum
+            <input type="date" id="date">
+          </label>
+          <label>
+            Klockslag
+            <input type="time" id="time" step="1">
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
+            UTC-offset
+            <input type="text" id="offset" placeholder="+02:00">
+          </label>
+          <label>
+            Sprak
+            <select id="lang">
+              <option value="sv">Svenska</option>
+              <option value="en">English</option>
+              <option value="no">Norsk</option>
+              <option value="da">Dansk</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Rubrik (valfritt)
+          <input type="text" id="title" placeholder="Till bröllopet">
+        </label>
+
+        <label>
+          Underrubrik (valfritt)
+          <input type="text" id="subtitle" placeholder="31 december 2026 kl. 23:59">
+        </label>
+
+        <div class="section-title">Design</div>
+        <div class="split">
+          <label>
+            Tema
+            <select id="theme">
+              <option value="soft">Soft Cards</option>
+              <option value="glass">Crystal Glass</option>
+              <option value="midnight">Midnight</option>
+              <option value="minimal">Minimal</option>
+            </select>
+          </label>
+          <label>
+            Dagsiffror
+            <select id="daysDigits">
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
+            Accent
+            <input type="color" id="accent">
+          </label>
+          <label>
+            Etikettfarg
+            <input type="color" id="label">
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
+            Separatorfarg
+            <input type="color" id="separator">
+          </label>
+          <label>
+            Kortbakgrund (CSS)
+            <input type="text" id="card" placeholder="rgba(255,255,255,0.95)">
+          </label>
+        </div>
+
+        <label>
+          Bakgrundsbild-URL (valfritt)
+          <input type="url" id="image" placeholder="https://din-sajt.se/bakgrund.jpg">
+        </label>
+
+        <label>
+          Bakgrundsgradient / farg (valfritt)
+          <input type="text" id="background" placeholder="linear-gradient(135deg, #304030, #7e6758)">
+        </label>
+
+        <label>
+          Hostad bas-URL
+          <input type="url" id="hostUrl" placeholder="https://din-domän.se/widgets">
+        </label>
+
+        <div class="section-title">Storlek</div>
+        <label>
+          Kortens rundning
+          <div class="range-row">
+            <input type="range" id="radius" min="0" max="30" value="10">
+            <div class="range-value" id="radiusValue">10 px</div>
+          </div>
+        </label>
+
+        <label>
+          Avstand mellan block
+          <div class="range-row">
+            <input type="range" id="gap" min="8" max="40" value="20">
+            <div class="range-value" id="gapValue">20 px</div>
+          </div>
+        </label>
+
+        <label>
+          Widgetbredd
+          <div class="range-row">
+            <input type="range" id="width" min="760" max="1400" value="1240">
+            <div class="range-value" id="widthValue">1240 px</div>
+          </div>
+        </label>
+
+        <label>
+          Widgethojd
+          <div class="range-row">
+            <input type="range" id="height" min="180" max="420" value="260">
+            <div class="range-value" id="heightValue">260 px</div>
+          </div>
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" id="showLabels" checked>
+          Visa etiketter
+        </label>
+
+        <label class="checkbox">
+          <input type="checkbox" id="showSeparators" checked>
+          Visa kolon mellan blocken
+        </label>
+      </form>
+    </section>
+
+    <section class="panel preview">
+      <div class="preview-head">
+        <div class="preview-title">
+          <strong>Forhandsvisning</strong>
+          <span class="hint">Byggaren laddar den riktiga widgeten i en iframe sa att resultatet matchar den inbaddade versionen.</span>
+        </div>
+        <div class="button-row">
+          <button type="button" id="copyUrl">Kopiera widget-URL</button>
+          <button type="button" class="ghost" id="copyIframe">Kopiera iframe</button>
+        </div>
+      </div>
+
+      <iframe id="previewFrame" title="Countdown preview"></iframe>
+
+      <div class="code-box">
+        <label>
+          Widget-URL
+          <textarea id="widgetUrl" readonly></textarea>
+        </label>
+      </div>
+
+      <div class="code-box">
+        <label>
+          Iframe-kod
+          <textarea id="iframeCode" readonly></textarea>
+        </label>
+      </div>
+
+      <p class="hint">Tips: I Google Sites fungerar oftast "Badda in via URL" bast. Om sidan kor pa GitHub Pages fylls hostad URL i automatiskt.</p>
+    </section>
+  </main>
+
+  <script>
+    const themePresets = {
+      soft: {
+        accent: "#b7c49f",
+        card: "rgba(255, 255, 255, 0.95)",
+        label: "#ffffff",
+        separator: "#ffffff",
+        background: "linear-gradient(135deg, rgba(41,46,36,0.82), rgba(89,70,55,0.68)), radial-gradient(circle at 12% 18%, rgba(189,210,168,0.26), transparent 34%), radial-gradient(circle at 88% 22%, rgba(247,232,215,0.22), transparent 30%), linear-gradient(140deg, #3a4031, #564337 58%, #2f3229)",
+        radius: 10,
+        gap: 20
+      },
+      glass: {
+        accent: "#ffffff",
+        card: "rgba(255, 255, 255, 0.16)",
+        label: "#ffffff",
+        separator: "#ffffff",
+        background: "linear-gradient(140deg, rgba(17,39,55,0.9), rgba(62,86,109,0.8)), radial-gradient(circle at 20% 20%, rgba(127,205,255,0.2), transparent 28%), radial-gradient(circle at 80% 20%, rgba(224,255,255,0.16), transparent 24%), linear-gradient(130deg, #173140, #214357 48%, #102738)",
+        radius: 18,
+        gap: 18
+      },
+      midnight: {
+        accent: "#f8d47b",
+        card: "linear-gradient(180deg, #1a2333, #111827)",
+        label: "#f4f6f8",
+        separator: "#f8d47b",
+        background: "radial-gradient(circle at 50% 0%, rgba(248,212,123,0.1), transparent 26%), linear-gradient(140deg, #050912, #0f172a 55%, #111827)",
+        radius: 14,
+        gap: 18
+      },
+      minimal: {
+        accent: "#223032",
+        card: "rgba(255, 255, 255, 0.7)",
+        label: "#223032",
+        separator: "#223032",
+        background: "radial-gradient(circle at top right, rgba(215,224,216,0.9), transparent 25%), linear-gradient(135deg, #f5f1eb, #e4ece5 56%, #eef4f0)",
+        radius: 18,
+        gap: 16
+      }
+    };
+
+    const form = document.getElementById("form");
+    const previewFrame = document.getElementById("previewFrame");
+    const widgetUrl = document.getElementById("widgetUrl");
+    const iframeCode = document.getElementById("iframeCode");
+    const copyUrl = document.getElementById("copyUrl");
+    const copyIframe = document.getElementById("copyIframe");
+
+    const ids = [
+      "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
+      "card", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
+      "width", "height", "showLabels", "showSeparators"
+    ];
+
+    const controls = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+
+    const rangeMap = {
+      radius: document.getElementById("radiusValue"),
+      gap: document.getElementById("gapValue"),
+      width: document.getElementById("widthValue"),
+      height: document.getElementById("heightValue")
+    };
+
+    const now = new Date();
+    const tomorrow = new Date(now.getTime() + 14 * 86400000);
+    const localDate = tomorrow.toISOString().slice(0, 10);
+    const localTime = "18:00:00";
+    const timezoneMinutes = -now.getTimezoneOffset();
+    const sign = timezoneMinutes >= 0 ? "+" : "-";
+    const hours = String(Math.floor(Math.abs(timezoneMinutes) / 60)).padStart(2, "0");
+    const minutes = String(Math.abs(timezoneMinutes) % 60).padStart(2, "0");
+
+    controls.date.value = localDate;
+    controls.time.value = localTime;
+    controls.offset.value = sign + hours + ":" + minutes;
+    controls.theme.value = "soft";
+    controls.lang.value = "sv";
+    controls.daysDigits.value = "3";
+    controls.width.value = "1240";
+    controls.height.value = "260";
+
+    const detectBaseUrl = () => {
+      const { protocol, origin, pathname } = window.location;
+      if (!/^https?:$/.test(protocol)) return "";
+      const normalizedPath = pathname.endsWith("/")
+        ? pathname.slice(0, -1)
+        : pathname.replace(/\/[^/]*$/, "");
+      return origin + normalizedPath;
+    };
+
+    controls.hostUrl.value = detectBaseUrl();
+
+    const applyThemePreset = (theme) => {
+      const preset = themePresets[theme];
+      if (!preset) return;
+      controls.accent.value = preset.accent;
+      controls.card.value = preset.card;
+      controls.label.value = preset.label;
+      controls.separator.value = preset.separator;
+      controls.background.value = preset.background;
+      controls.radius.value = String(preset.radius);
+      controls.gap.value = String(preset.gap);
+      updateRangeLabels();
+    };
+
+    const updateRangeLabels = () => {
+      rangeMap.radius.textContent = controls.radius.value + " px";
+      rangeMap.gap.textContent = controls.gap.value + " px";
+      rangeMap.width.textContent = controls.width.value + " px";
+      rangeMap.height.textContent = controls.height.value + " px";
+    };
+
+    const buildTarget = () => {
+      const date = controls.date.value || "2026-12-31";
+      const time = controls.time.value || "23:59:59";
+      const offset = controls.offset.value || "+01:00";
+      return date + "T" + time + offset;
+    };
+
+    const buildParams = () => {
+      const query = new URLSearchParams();
+      query.set("target", buildTarget());
+      query.set("theme", controls.theme.value);
+      query.set("lang", controls.lang.value);
+      query.set("daysDigits", controls.daysDigits.value);
+      query.set("showLabels", String(controls.showLabels.checked));
+      query.set("showSeparators", String(controls.showSeparators.checked));
+      query.set("radius", controls.radius.value);
+      query.set("gap", controls.gap.value);
+      query.set("width", controls.width.value);
+      query.set("height", controls.height.value);
+
+      if (controls.title.value.trim()) query.set("title", controls.title.value.trim());
+      if (controls.subtitle.value.trim()) query.set("subtitle", controls.subtitle.value.trim());
+      if (controls.accent.value) query.set("accent", controls.accent.value);
+      if (controls.card.value) query.set("card", controls.card.value);
+      if (controls.label.value) query.set("label", controls.label.value);
+      if (controls.separator.value) query.set("separator", controls.separator.value);
+      if (controls.image.value.trim()) query.set("image", controls.image.value.trim());
+      if (controls.background.value.trim()) query.set("background", controls.background.value.trim());
+
+      return query.toString();
+    };
+
+    const normalizeHost = (value) => value.replace(/\/+$/, "");
+
+    const updateOutput = () => {
+      const params = buildParams();
+      const localPath = "countdown-widget.html?" + params;
+      previewFrame.src = localPath;
+      previewFrame.style.height = String(Math.max(Number(controls.height.value) + 48, 240)) + "px";
+
+      const host = controls.hostUrl.value.trim();
+      const publicUrl = host
+        ? normalizeHost(host) + "/countdown-widget.html?" + params
+        : localPath;
+
+      widgetUrl.value = publicUrl;
+      iframeCode.value = '<iframe src="' + publicUrl + '" width="100%" height="' + controls.height.value + '" style="border:0;" loading="lazy" referrerpolicy="no-referrer"></iframe>';
+    };
+
+    const copyText = async (value) => {
+      try {
+        await navigator.clipboard.writeText(value);
+      } catch (error) {
+        window.alert("Kopiering misslyckades. Markera texten och kopiera manuellt.");
+      }
+    };
+
+    form.addEventListener("input", updateOutput);
+    controls.theme.addEventListener("change", (event) => {
+      applyThemePreset(event.target.value);
+      updateOutput();
+    });
+
+    copyUrl.addEventListener("click", () => copyText(widgetUrl.value));
+    copyIframe.addEventListener("click", () => copyText(iframeCode.value));
+
+    applyThemePreset("soft");
+    updateRangeLabels();
+    updateOutput();
+  </script>
+</body>
+</html>
