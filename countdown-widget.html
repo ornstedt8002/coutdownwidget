@@ -287,6 +287,8 @@
       card: "",
       cardColor: "",
       cardOpacity: "",
+      cardBorderColor: "",
+      cardBorderOpacity: "",
       cardBorder: "",
       label: "",
       separator: "",
@@ -310,15 +312,6 @@
       labels: ""
     };
 
-    const params = new URLSearchParams(window.location.search);
-    const config = { ...DEFAULTS };
-
-    for (const key of Object.keys(DEFAULTS)) {
-      if (params.has(key)) {
-        config[key] = params.get(key);
-      }
-    }
-
     const body = document.body;
     const header = document.getElementById("header");
     const title = document.getElementById("title");
@@ -334,7 +327,7 @@
     };
 
     const applyVar = (name, value, formatter = (input) => input) => {
-      if (!value) return;
+      if (!value && value !== 0) return;
       body.style.setProperty(name, formatter(value));
     };
 
@@ -351,9 +344,18 @@
       };
     };
 
-    const safeLabels = () => {
+    const mergeConfig = (target, source) => {
+      if (!source || typeof source !== "object") return;
+      for (const key of Object.keys(DEFAULTS)) {
+        if (source[key] !== undefined && source[key] !== null) {
+          target[key] = source[key];
+        }
+      }
+    };
+
+    const safeLabels = (config) => {
       if (config.labels) {
-        const custom = config.labels.split("|").map((item) => item.trim()).filter(Boolean);
+        const custom = String(config.labels).split("|").map((item) => item.trim()).filter(Boolean);
         if (custom.length === 4) {
           return custom;
         }
@@ -372,63 +374,60 @@
       return allowed.includes(value) ? value : "soft";
     };
 
-    body.dataset.theme = normalizeTheme(config.theme);
+    const showStatus = (message) => {
+      status.textContent = message;
+      status.classList.remove("hidden");
+    };
 
-    if (config.image) {
-      body.style.setProperty("--image-url", 'url("' + config.image.replace(/"/g, '\\"') + '")');
-      body.dataset.hasImage = "true";
-    }
+    const resetStatus = () => {
+      status.textContent = "";
+      status.classList.add("hidden");
+    };
 
-    applyVar("--accent", config.accent);
-    if (config.cardColor) {
-      const rgb = hexToRgb(config.cardColor);
-      const opacity = Math.min(100, Math.max(0, Number.parseInt(config.cardOpacity || "100", 10))) / 100;
-      if (rgb) {
-        body.style.setProperty("--card-bg", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
+    const loadExternalConfig = async (source) => {
+      const url = new URL(source, window.location.href);
+      const response = await fetch(url.toString(), { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error("Kunde inte lasa konfigurationen (" + response.status + ").");
       }
-    }
-    applyVar("--card-bg", config.card);
-    applyVar("--card-border", config.cardBorder);
-    applyVar("--label-color", config.label);
-    applyVar("--separator-color", config.separator);
-    applyVar("--title-color", config.titleColor);
-    applyVar("--page-bg", config.background);
-    applyVar("--radius", config.radius, (value) => value + "px");
-    applyVar("--countdown-gap", config.gap, (value) => value + "px");
-    applyVar("--digit-gap", config.digitGap, (value) => value + "px");
-    applyVar("--panel-max-width", config.width, (value) => value + "px");
-    applyVar("--digit-width", config.digitWidth, (value) => value + "px");
-    applyVar("--digit-height", config.digitHeight, (value) => value + "px");
-    applyVar("--digit-font-size", config.digitFont, (value) => value + "px");
-    applyVar("--panel-bg", config.panelBg);
-    applyVar("--panel-border", config.panelBorder);
-    applyVar("--panel-shadow", config.panelShadow);
-    applyVar("--title-font-size", config.titleSize, (value) => value + "px");
-    applyVar("--label-font-size", config.labelSize, (value) => value + "px");
-    applyVar("--panel-padding", config.padding, (value) => value + "px");
+      const payload = await response.json();
+      if (payload && typeof payload.settings === "object") {
+        return payload.settings;
+      }
+      if (payload && typeof payload === "object") {
+        return payload;
+      }
+      throw new Error("Konfigurationsfilen maste innehalla JSON-data.");
+    };
 
-    if (config.height) {
-      document.body.style.minHeight = config.height + "px";
-    }
+    const buildConfig = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const config = { ...DEFAULTS };
 
-    setText(title, config.title);
-    setText(subtitle, config.subtitle);
-    if (title.textContent || subtitle.textContent) {
-      header.classList.remove("hidden");
-    }
+      if (params.has("config")) {
+        try {
+          const externalConfig = await loadExternalConfig(params.get("config"));
+          mergeConfig(config, externalConfig);
+        } catch (error) {
+          showStatus("Konfigurationen kunde inte laddas: " + error.message);
+        }
+      }
 
-    const labels = safeLabels();
-    const showLabels = parseBoolean(config.showLabels, true);
-    const showSeparators = parseBoolean(config.showSeparators, true);
-    const daysDigits = Math.max(1, Number.parseInt(config.daysDigits, 10) || 3);
-    const targetDate = new Date(config.target);
+      for (const key of Object.keys(DEFAULTS)) {
+        if (params.has(key)) {
+          config[key] = params.get(key);
+        }
+      }
+
+      return config;
+    };
 
     const formatDigits = (value, minimumDigits) => {
       const digits = String(value).padStart(minimumDigits, "0");
       return digits.split("").map((digit) => '<div class="digit">' + digit + "</div>").join("");
     };
 
-    const unitTemplate = (value, minimumDigits, labelText) => {
+    const unitTemplate = (value, minimumDigits, labelText, showLabels) => {
       return [
         '<div class="unit">',
         '  <div class="digits">' + formatDigits(value, minimumDigits) + "</div>",
@@ -439,23 +438,86 @@
 
     const separatorTemplate = () => '<div class="separator" aria-hidden="true">:</div>';
 
-    const renderCountdown = (remaining) => {
+    const applyVisualConfig = (config) => {
+      body.dataset.theme = normalizeTheme(config.theme);
+      body.dataset.hasImage = "false";
+
+      if (config.image) {
+        body.style.setProperty("--image-url", 'url("' + String(config.image).replace(/"/g, '\\"') + '")');
+        body.dataset.hasImage = "true";
+      }
+
+      applyVar("--accent", config.accent);
+      if (config.cardColor) {
+        const rgb = hexToRgb(String(config.cardColor));
+        const opacity = Math.min(100, Math.max(0, Number.parseInt(config.cardOpacity || "100", 10))) / 100;
+        if (rgb) {
+          body.style.setProperty("--card-bg", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
+        }
+      }
+      applyVar("--card-bg", config.card);
+      if (config.cardBorderColor) {
+        const rgb = hexToRgb(String(config.cardBorderColor));
+        const opacity = Math.min(100, Math.max(0, Number.parseInt(config.cardBorderOpacity || "100", 10))) / 100;
+        if (rgb) {
+          body.style.setProperty("--card-border", "rgba(" + rgb.r + ", " + rgb.g + ", " + rgb.b + ", " + opacity + ")");
+        }
+      }
+      applyVar("--card-border", config.cardBorder);
+      applyVar("--label-color", config.label);
+      applyVar("--separator-color", config.separator);
+      applyVar("--title-color", config.titleColor);
+      applyVar("--page-bg", config.background);
+      applyVar("--radius", config.radius, (value) => value + "px");
+      applyVar("--countdown-gap", config.gap, (value) => value + "px");
+      applyVar("--digit-gap", config.digitGap, (value) => value + "px");
+      applyVar("--panel-max-width", config.width, (value) => value + "px");
+      applyVar("--digit-width", config.digitWidth, (value) => value + "px");
+      applyVar("--digit-height", config.digitHeight, (value) => value + "px");
+      applyVar("--digit-font-size", config.digitFont, (value) => value + "px");
+      applyVar("--panel-bg", config.panelBg);
+      applyVar("--panel-border", config.panelBorder);
+      applyVar("--panel-shadow", config.panelShadow);
+      applyVar("--title-font-size", config.titleSize, (value) => value + "px");
+      applyVar("--label-font-size", config.labelSize, (value) => value + "px");
+      applyVar("--panel-padding", config.padding, (value) => value + "px");
+
+      if (config.height) {
+        body.style.minHeight = config.height + "px";
+      }
+    };
+
+    const renderHeader = (config) => {
+      header.classList.add("hidden");
+      title.textContent = "";
+      subtitle.textContent = "";
+      subtitle.classList.add("hidden");
+
+      setText(title, config.title);
+      setText(subtitle, config.subtitle);
+
+      if (title.textContent || subtitle.textContent) {
+        header.classList.remove("hidden");
+      }
+    };
+
+    const renderCountdown = (remaining, options) => {
       const parts = [
-        unitTemplate(remaining.days, Math.max(daysDigits, String(remaining.days).length), labels[0]),
-        unitTemplate(remaining.hours, 2, labels[1]),
-        unitTemplate(remaining.minutes, 2, labels[2]),
-        unitTemplate(remaining.seconds, 2, labels[3])
+        unitTemplate(remaining.days, Math.max(options.daysDigits, String(remaining.days).length), options.labels[0], options.showLabels),
+        unitTemplate(remaining.hours, 2, options.labels[1], options.showLabels),
+        unitTemplate(remaining.minutes, 2, options.labels[2], options.showLabels),
+        unitTemplate(remaining.seconds, 2, options.labels[3], options.showLabels)
       ];
 
       countdown.innerHTML = parts
         .map((part, index) => {
-          if (!showSeparators || index === parts.length - 1) return part;
+          if (!options.showSeparators || index === parts.length - 1) return part;
           return part + separatorTemplate();
         })
         .join("");
     };
 
-    const getRemaining = () => {
+    const getRemaining = (targetDate) => {
       const diff = Math.max(targetDate.getTime() - Date.now(), 0);
       const days = Math.floor(diff / 86400000);
       const hours = Math.floor((diff % 86400000) / 3600000);
@@ -464,24 +526,40 @@
       return { diff, days, hours, minutes, seconds };
     };
 
-    const invalidDate = Number.isNaN(targetDate.getTime());
+    const start = async () => {
+      const config = await buildConfig();
+      applyVisualConfig(config);
+      renderHeader(config);
 
-    if (invalidDate) {
-      countdown.innerHTML = '<div class="status">Ogiltigt datum. Ange till exempel 2026-12-31T23:59:59+01:00</div>';
-    } else {
+      const options = {
+        labels: safeLabels(config),
+        showLabels: parseBoolean(config.showLabels, true),
+        showSeparators: parseBoolean(config.showSeparators, true),
+        daysDigits: Math.max(1, Number.parseInt(config.daysDigits, 10) || 3)
+      };
+
+      const targetDate = new Date(config.target);
+      if (Number.isNaN(targetDate.getTime())) {
+        countdown.innerHTML = '<div class="status">Ogiltigt datum. Ange till exempel 2026-12-31T23:59:59+01:00</div>';
+        return;
+      }
+
       const update = () => {
-        const remaining = getRemaining();
-        renderCountdown(remaining);
+        const remaining = getRemaining(targetDate);
+        renderCountdown(remaining, options);
 
         if (remaining.diff <= 0) {
-          status.textContent = config.endText;
-          status.classList.remove("hidden");
+          showStatus(config.endText);
+        } else if (!status.textContent.startsWith("Konfigurationen kunde inte")) {
+          resetStatus();
         }
       };
 
       update();
       window.setInterval(update, 1000);
-    }
+    };
+
+    start();
   </script>
 </body>
 </html>
