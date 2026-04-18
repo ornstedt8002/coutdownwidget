@@ -355,6 +355,25 @@
           <input type="text" id="card" placeholder="linear-gradient(...)">
         </label>
 
+        <div class="split">
+          <label>
+            Kortkant
+            <input type="color" id="cardBorderColor">
+          </label>
+          <label>
+            Kortkant (avancerad CSS, valfritt)
+            <input type="text" id="cardBorder" placeholder="rgba(255,255,255,0.56)">
+          </label>
+        </div>
+
+        <label>
+          Kortkantens transparens
+          <div class="range-row">
+            <input type="range" id="cardBorderOpacity" min="0" max="100" value="56">
+            <div class="range-value" id="cardBorderOpacityValue">56 %</div>
+          </div>
+        </label>
+
         <label>
           Bakgrundsbild-URL (valfritt)
           <input type="url" id="image" placeholder="https://din-sajt.se/bakgrund.jpg">
@@ -454,6 +473,9 @@
         cardColor: "#ffffff",
         cardOpacity: 95,
         card: "",
+        cardBorderColor: "#ffffff",
+        cardBorderOpacity: 56,
+        cardBorder: "",
         label: "#ffffff",
         separator: "#ffffff",
         background: "linear-gradient(135deg, rgba(41,46,36,0.82), rgba(89,70,55,0.68)), radial-gradient(circle at 12% 18%, rgba(189,210,168,0.26), transparent 34%), radial-gradient(circle at 88% 22%, rgba(247,232,215,0.22), transparent 30%), linear-gradient(140deg, #3a4031, #564337 58%, #2f3229)",
@@ -465,6 +487,9 @@
         cardColor: "#ffffff",
         cardOpacity: 16,
         card: "",
+        cardBorderColor: "#ffffff",
+        cardBorderOpacity: 28,
+        cardBorder: "",
         label: "#ffffff",
         separator: "#ffffff",
         background: "linear-gradient(140deg, rgba(17,39,55,0.9), rgba(62,86,109,0.8)), radial-gradient(circle at 20% 20%, rgba(127,205,255,0.2), transparent 28%), radial-gradient(circle at 80% 20%, rgba(224,255,255,0.16), transparent 24%), linear-gradient(130deg, #173140, #214357 48%, #102738)",
@@ -476,6 +501,9 @@
         cardColor: "#162033",
         cardOpacity: 100,
         card: "",
+        cardBorderColor: "#f8d47b",
+        cardBorderOpacity: 20,
+        cardBorder: "",
         label: "#f4f6f8",
         separator: "#f8d47b",
         background: "radial-gradient(circle at 50% 0%, rgba(248,212,123,0.1), transparent 26%), linear-gradient(140deg, #050912, #0f172a 55%, #111827)",
@@ -487,6 +515,9 @@
         cardColor: "#ffffff",
         cardOpacity: 70,
         card: "",
+        cardBorderColor: "#223032",
+        cardBorderOpacity: 14,
+        cardBorder: "",
         label: "#223032",
         separator: "#223032",
         background: "radial-gradient(circle at top right, rgba(215,224,216,0.9), transparent 25%), linear-gradient(135deg, #f5f1eb, #e4ece5 56%, #eef4f0)",
@@ -504,7 +535,7 @@
 
     const ids = [
       "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
-      "card", "cardColor", "cardOpacity", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
+      "card", "cardColor", "cardOpacity", "cardBorder", "cardBorderColor", "cardBorderOpacity", "label", "separator", "image", "background", "hostUrl", "radius", "gap",
       "width", "height", "showLabels", "showSeparators"
     ];
 
@@ -515,7 +546,8 @@
       gap: document.getElementById("gapValue"),
       width: document.getElementById("widthValue"),
       height: document.getElementById("heightValue"),
-      cardOpacity: document.getElementById("cardOpacityValue")
+      cardOpacity: document.getElementById("cardOpacityValue"),
+      cardBorderOpacity: document.getElementById("cardBorderOpacityValue")
     };
 
     const now = new Date();
@@ -554,6 +586,9 @@
       controls.cardColor.value = preset.cardColor;
       controls.cardOpacity.value = String(preset.cardOpacity);
       controls.card.value = preset.card;
+      controls.cardBorderColor.value = preset.cardBorderColor;
+      controls.cardBorderOpacity.value = String(preset.cardBorderOpacity);
+      controls.cardBorder.value = preset.cardBorder;
       controls.label.value = preset.label;
       controls.separator.value = preset.separator;
       controls.background.value = preset.background;
@@ -568,6 +603,7 @@
       rangeMap.width.textContent = controls.width.value + " px";
       rangeMap.height.textContent = controls.height.value + " px";
       rangeMap.cardOpacity.textContent = controls.cardOpacity.value + " %";
+      rangeMap.cardBorderOpacity.textContent = controls.cardBorderOpacity.value + " %";
     };
 
     const buildTarget = () => {
@@ -596,6 +632,9 @@
       if (controls.cardColor.value) query.set("cardColor", controls.cardColor.value);
       if (controls.cardOpacity.value) query.set("cardOpacity", controls.cardOpacity.value);
       if (controls.card.value) query.set("card", controls.card.value);
+      if (controls.cardBorderColor.value) query.set("cardBorderColor", controls.cardBorderColor.value);
+      if (controls.cardBorderOpacity.value) query.set("cardBorderOpacity", controls.cardBorderOpacity.value);
+      if (controls.cardBorder.value) query.set("cardBorder", controls.cardBorder.value);
       if (controls.label.value) query.set("label", controls.label.value);
       if (controls.separator.value) query.set("separator", controls.separator.value);
       if (controls.image.value.trim()) query.set("image", controls.image.value.trim());
