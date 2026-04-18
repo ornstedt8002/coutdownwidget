@@ -47,6 +47,9 @@ Vanliga parametrar:
 - `cardColor` - kortens basfarg, till exempel `#ffffff`
 - `cardOpacity` - kortens transparens i procent, till exempel `95`
 - `card` - valfri avancerad CSS-override for kortens bakgrund, till exempel `linear-gradient(...)`
+- `cardBorderColor` - kortkantens basfarg, till exempel `#ffffff`
+- `cardBorderOpacity` - kortkantens transparens i procent, till exempel `56`
+- `cardBorder` - valfri avancerad CSS-override for kortkanten, till exempel `rgba(255,255,255,0.56)`
 - `label` - textfarg for enhetsnamnen
 - `separator` - farg pa kolon
 - `background` - egen CSS-bakgrund eller gradient
