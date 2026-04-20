@@ -254,7 +254,7 @@
       box-shadow: var(--card-shadow);
       backdrop-filter: blur(var(--blur-strength));
       color: var(--accent);
-      overflow: hidden;
+      overflow: visible;
       isolation: isolate;
       perspective: 1600px;
       transform-style: preserve-3d;
@@ -378,22 +378,22 @@
 
     @keyframes flipFront {
       0% {
-        transform: rotateX(0deg);
+        transform: rotateX(0deg) scaleX(1);
         filter: brightness(1);
       }
 
       36% {
-        transform: rotateX(-24deg);
+        transform: rotateX(-24deg) scaleX(1.05);
         filter: brightness(1.03);
       }
 
       54% {
-        transform: rotateX(-89.9deg);
+        transform: rotateX(-89.9deg) scaleX(1.18);
         filter: brightness(0.84);
       }
 
       100% {
-        transform: rotateX(-89.9deg);
+        transform: rotateX(-89.9deg) scaleX(1.08);
         filter: brightness(0.8);
       }
     }
@@ -401,22 +401,22 @@
     @keyframes flipBack {
       0%,
       54% {
-        transform: rotateX(90deg);
+        transform: rotateX(90deg) scaleX(1.18);
         filter: brightness(0.82);
       }
 
       78% {
-        transform: rotateX(28deg);
+        transform: rotateX(28deg) scaleX(1.14);
         filter: brightness(0.95);
       }
 
       94% {
-        transform: rotateX(-6deg);
+        transform: rotateX(-6deg) scaleX(1.04);
         filter: brightness(1.01);
       }
 
       100% {
-        transform: rotateX(0deg);
+        transform: rotateX(0deg) scaleX(1);
         filter: brightness(1);
       }
     }
