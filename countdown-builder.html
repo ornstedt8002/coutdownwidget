@@ -469,7 +469,7 @@
         <label>
           Korthojd
           <div class="range-row">
-            <input type="range" id="height" min="110" max="420" value="150">
+            <input type="range" id="height" min="72" max="420" value="150">
             <div class="range-value" id="heightValue">150 px</div>
           </div>
         </label>
@@ -919,7 +919,7 @@
       const cardHeight = Number(controls.height.value) || 150;
       const labelsHeight = controls.showLabels.checked ? 40 : 8;
       const headerHeight = controls.title.value.trim() || controls.subtitle.value.trim() ? 52 : 0;
-      return Math.max(cardHeight + labelsHeight + headerHeight, 120);
+      return Math.max(cardHeight + labelsHeight + headerHeight, 84);
     };
 
     const updateOutput = () => {
