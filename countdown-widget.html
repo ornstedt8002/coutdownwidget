@@ -597,8 +597,10 @@
     }
 
     .separator {
-      align-self: start;
-      padding-top: 14px;
+      align-self: flex-start;
+      height: var(--digit-height);
+      display: flex;
+      align-items: center;
       color: var(--separator-color);
       font-size: clamp(2.4rem, 4.2vw, 4.5rem);
       font-weight: 700;
@@ -650,7 +652,6 @@
 
       .separator {
         font-size: 2rem;
-        padding-top: 10px;
       }
     }
 
