@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-20T08:44:29.493Z",
+  "updatedAt": "2026-04-20T08:45:50.158Z",
   "settings": {
     "target": "2026-08-08T16:00:00+02:00",
     "theme": "soft",
@@ -10,7 +10,7 @@
     "showSeparators": true,
     "flip": true,
     "radius": "6",
-    "gap": "20",
+    "gap": "14",
     "width": "940",
     "height": "110",
     "digitFont": "50",
