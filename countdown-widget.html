@@ -256,7 +256,7 @@
       color: var(--accent);
       overflow: hidden;
       isolation: isolate;
-      perspective: 900px;
+      perspective: 1600px;
       transform-style: preserve-3d;
     }
 
@@ -328,6 +328,10 @@
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 78%);
     }
 
+    .digit-face-top.digit-face-next {
+      clip-path: inset(0 0 100% 0);
+    }
+
     .digit-face-bottom {
       background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), transparent 70%);
     }
@@ -356,7 +360,7 @@
       animation: flipFront var(--flip-duration) cubic-bezier(0.22, 0.76, 0.18, 1) both;
       box-shadow:
         inset 0 -12px 22px rgba(0, 0, 0, 0.12),
-        0 10px 22px rgba(0, 0, 0, 0.18);
+        0 6px 14px rgba(0, 0, 0, 0.14);
       filter: brightness(1);
     }
 
@@ -364,65 +368,70 @@
       top: 50%;
       bottom: auto;
       transform-origin: top center;
-      transform: rotateX(92deg) translateZ(10px) scaleX(0.98);
+      transform: rotateX(90deg);
       animation: flipBack var(--flip-duration) cubic-bezier(0.2, 0.74, 0.2, 1) both;
       box-shadow:
         inset 0 12px 22px rgba(255, 255, 255, 0.08),
-        0 12px 24px rgba(0, 0, 0, 0.18);
-      filter: brightness(0.84);
+        0 6px 14px rgba(0, 0, 0, 0.14);
+      filter: brightness(0.86);
     }
 
     @keyframes flipFront {
       0% {
-        transform: rotateX(0deg) translateZ(0) scaleY(1);
+        transform: rotateX(0deg);
         filter: brightness(1);
       }
 
-      18% {
-        transform: rotateX(-12deg) translateZ(16px) scaleX(1.08) scaleY(1.01);
+      32% {
+        transform: rotateX(-26deg);
         filter: brightness(1.03);
       }
 
-      52% {
-        transform: rotateX(-58deg) translateZ(42px) scaleX(1.16) scaleY(1.03);
-        filter: brightness(0.96);
-      }
-
-      78% {
-        transform: rotateX(-82deg) translateZ(20px) scaleX(1.06) scaleY(1.01);
+      74% {
+        transform: rotateX(-78deg);
         filter: brightness(0.88);
       }
 
       100% {
-        transform: rotateX(-96deg) translateZ(2px) scaleX(0.98) scaleY(1);
+        transform: rotateX(-89.9deg);
         filter: brightness(0.76);
       }
     }
 
     @keyframes flipBack {
-      0% {
-        transform: rotateX(92deg) translateZ(10px) scaleX(0.98) scaleY(1);
+      0%,
+      46% {
+        transform: rotateX(90deg);
         filter: brightness(0.82);
       }
 
-      32% {
-        transform: rotateX(54deg) translateZ(24px) scaleX(1.04) scaleY(1.02);
-        filter: brightness(0.92);
+      72% {
+        transform: rotateX(24deg);
+        filter: brightness(0.96);
       }
 
-      62% {
-        transform: rotateX(18deg) translateZ(44px) scaleX(1.18) scaleY(1.04);
-        filter: brightness(1.06);
-      }
-
-      82% {
-        transform: rotateX(-4deg) translateZ(14px) scaleX(1.08) scaleY(1.01);
-        filter: brightness(1.02);
+      88% {
+        transform: rotateX(-6deg);
+        filter: brightness(1.01);
       }
 
       100% {
-        transform: rotateX(0deg) translateZ(0) scaleX(1) scaleY(1);
+        transform: rotateX(0deg);
         filter: brightness(1);
+      }
+    }
+
+    @keyframes revealTopBehind {
+      0% {
+        clip-path: inset(0 0 100% 0);
+      }
+
+      48% {
+        clip-path: inset(0 0 0 0);
+      }
+
+      100% {
+        clip-path: inset(0 0 0 0);
       }
     }
 
@@ -459,6 +468,10 @@
 
     .digit.is-flipping .digit-face-bottom.digit-face-next {
       animation: revealNextBottom var(--flip-duration) linear both;
+    }
+
+    .digit.is-flipping .digit-face-top.digit-face-next {
+      animation: revealTopBehind var(--flip-duration) linear both;
     }
 
     .separator {
