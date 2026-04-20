@@ -974,7 +974,7 @@
       applyVar("--digit-gap", config.digitGap, (value) => value + "px");
       applyVar("--panel-max-width", config.width, (value) => value + "px");
       applyVar("--digit-width", config.digitWidth, (value) => value + "px");
-      applyVar("--digit-height", config.digitHeight, (value) => value + "px");
+      applyVar("--digit-height", config.digitHeight || config.height, (value) => value + "px");
       applyVar("--digit-font-size", config.digitFont, (value) => value + "px");
       applyVar("--panel-bg", config.panelBg);
       applyVar("--panel-border", config.panelBorder);
