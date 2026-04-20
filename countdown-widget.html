@@ -32,6 +32,7 @@
       --panel-border: transparent;
       --panel-shadow: none;
       --flip-duration: 0.94s;
+      --responsive-scale: 1;
     }
 
     * {
@@ -193,17 +194,28 @@
       background-repeat: no-repeat;
     }
 
-    .widget-shell {
+    .widget-frame {
       position: relative;
       z-index: 1;
+      width: auto;
+      height: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .widget-shell {
+      position: relative;
       width: fit-content;
-      max-width: min(var(--panel-max-width), 100%);
+      max-width: none;
       padding: var(--panel-padding);
       border-radius: calc(var(--radius) + 6px);
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
       box-shadow: var(--panel-shadow);
       backdrop-filter: none;
+      transform: scale(var(--responsive-scale));
+      transform-origin: top center;
+      will-change: transform;
     }
 
     .header {
@@ -232,7 +244,7 @@
 
     .countdown {
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: flex-start;
       justify-content: center;
       gap: var(--countdown-gap);
@@ -682,14 +694,16 @@
 </head>
 <body data-theme="soft" data-has-image="false">
   <div class="page-backdrop" aria-hidden="true"></div>
-  <main class="widget-shell">
-    <header class="header hidden" id="header">
-      <div class="title" id="title"></div>
-      <div class="subtitle hidden" id="subtitle"></div>
-    </header>
-    <section class="countdown" id="countdown" aria-live="polite"></section>
-    <div class="status hidden" id="status"></div>
-  </main>
+  <div class="widget-frame" id="widgetFrame">
+    <main class="widget-shell" id="widgetShell">
+      <header class="header hidden" id="header">
+        <div class="title" id="title"></div>
+        <div class="subtitle hidden" id="subtitle"></div>
+      </header>
+      <section class="countdown" id="countdown" aria-live="polite"></section>
+      <div class="status hidden" id="status"></div>
+    </main>
+  </div>
 
   <script>
     const LABELS = {
@@ -742,11 +756,14 @@
     };
 
     const body = document.body;
+    const widgetFrame = document.getElementById("widgetFrame");
+    const widgetShell = document.getElementById("widgetShell");
     const header = document.getElementById("header");
     const title = document.getElementById("title");
     const subtitle = document.getElementById("subtitle");
     const countdown = document.getElementById("countdown");
     const status = document.getElementById("status");
+    let responsiveFrame = 0;
 
     const parseBoolean = (value, fallback) => {
       if (value === "" || value == null) return fallback;
@@ -835,6 +852,31 @@
     const resetStatus = () => {
       status.textContent = "";
       status.classList.add("hidden");
+    };
+
+    const applyResponsiveLayout = () => {
+      body.style.setProperty("--responsive-scale", "1");
+      widgetFrame.style.width = "";
+      widgetFrame.style.height = "";
+
+      const viewportWidth = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const availableWidth = Math.max(viewportWidth - 2, 0);
+      const naturalWidth = widgetShell.scrollWidth;
+      const naturalHeight = widgetShell.scrollHeight;
+      if (!naturalWidth || !naturalHeight) return;
+
+      const scale = Math.min(1, availableWidth / naturalWidth);
+      body.style.setProperty("--responsive-scale", scale.toFixed(4));
+      widgetFrame.style.width = (naturalWidth * scale).toFixed(2) + "px";
+      widgetFrame.style.height = (naturalHeight * scale).toFixed(2) + "px";
+    };
+
+    const scheduleResponsiveLayout = () => {
+      if (responsiveFrame) return;
+      responsiveFrame = window.requestAnimationFrame(() => {
+        responsiveFrame = 0;
+        applyResponsiveLayout();
+      });
     };
 
     const loadExternalConfig = async (source) => {
@@ -1082,6 +1124,7 @@
 
         if (Number.isNaN(targetDate.getTime())) {
           countdown.innerHTML = '<div class="status">Ogiltigt datum. Ange till exempel 2026-12-31T23:59:59+01:00</div>';
+          scheduleResponsiveLayout();
           return false;
         }
 
@@ -1102,6 +1145,7 @@
         const remaining = getRemaining(targetDate);
         renderCountdown(remaining, options, previousSnapshot);
         previousSnapshot = remaining;
+        scheduleResponsiveLayout();
 
         if (remaining.diff <= 0) {
           showStatus(currentConfig.endText);
@@ -1123,6 +1167,8 @@
           }
         }, 30000);
       }
+
+      window.addEventListener("resize", scheduleResponsiveLayout);
     };
 
     start();
