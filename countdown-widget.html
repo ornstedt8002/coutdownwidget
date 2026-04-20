@@ -256,7 +256,8 @@
       color: var(--accent);
       overflow: visible;
       isolation: isolate;
-      perspective: 1600px;
+      perspective: 2400px;
+      perspective-origin: 50% 46%;
       transform-style: preserve-3d;
     }
 
@@ -355,7 +356,8 @@
       backface-visibility: hidden;
       pointer-events: none;
       transform-style: preserve-3d;
-      will-change: transform, filter, box-shadow;
+      overflow: visible;
+      will-change: transform, filter, box-shadow, clip-path;
     }
 
     .digit-flap-front {
@@ -365,67 +367,63 @@
       border-radius: var(--radius) var(--radius) 0 0;
       clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       transform-origin: bottom center;
-      animation: flipFront var(--flip-duration) cubic-bezier(0.22, 0.76, 0.18, 1) both;
+      animation: flipFront var(--flip-duration) cubic-bezier(0.24, 0.72, 0.16, 1) both;
       box-shadow:
-        inset 0 -12px 22px rgba(0, 0, 0, 0.12),
-        0 6px 14px rgba(0, 0, 0, 0.14);
+        inset 0 -12px 24px rgba(0, 0, 0, 0.14),
+        0 14px 24px rgba(0, 0, 0, 0.22);
       filter: brightness(1);
     }
 
     .digit-flap-back {
       top: 50%;
       bottom: auto;
-      left: -9%;
-      width: 118%;
+      left: 0;
+      width: 100%;
       border-radius: 0 0 var(--radius) var(--radius);
-      clip-path: polygon(7.63% 0, 92.37% 0, 100% 100%, 0 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       transform-origin: top center;
       transform: rotateX(90deg);
-      animation: flipBack var(--flip-duration) cubic-bezier(0.2, 0.74, 0.2, 1) both;
+      animation: flipBack var(--flip-duration) cubic-bezier(0.24, 0.72, 0.16, 1) both;
       box-shadow:
-        inset 0 12px 22px rgba(255, 255, 255, 0.08),
-        0 6px 14px rgba(0, 0, 0, 0.14);
+        inset 0 12px 24px rgba(255, 255, 255, 0.08),
+        0 14px 24px rgba(0, 0, 0, 0.22);
       filter: brightness(0.86);
     }
 
     @keyframes flipFront {
       0% {
-        left: 0;
-        width: 100%;
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        transform: rotateX(0deg);
+        transform: translateZ(0) rotateX(0deg);
         filter: brightness(1);
       }
 
-      18% {
-        left: -2%;
-        width: 104%;
-        clip-path: polygon(0 0, 100% 0, 98.08% 100%, 1.92% 100%);
-        transform: rotateX(-12deg);
+      10% {
+        clip-path: polygon(-3% 0, 103% 0, 100% 100%, 0 100%);
+        transform: translateZ(8px) rotateX(-7deg);
         filter: brightness(1.03);
       }
 
-      36% {
-        left: -5%;
-        width: 110%;
-        clip-path: polygon(0 0, 100% 0, 95.45% 100%, 4.55% 100%);
-        transform: rotateX(-24deg);
-        filter: brightness(1.03);
+      24% {
+        clip-path: polygon(-9% 0, 109% 0, 100% 100%, 0 100%);
+        transform: translateZ(20px) rotateX(-18deg);
+        filter: brightness(1.06);
+      }
+
+      42% {
+        clip-path: polygon(-18% 0, 118% 0, 100% 100%, 0 100%);
+        transform: translateZ(38px) rotateX(-52deg);
+        filter: brightness(1);
       }
 
       54% {
-        left: -9%;
-        width: 118%;
-        clip-path: polygon(0 0, 100% 0, 92.37% 100%, 7.63% 100%);
-        transform: rotateX(-89.9deg);
-        filter: brightness(0.84);
+        clip-path: polygon(-24% 0, 124% 0, 100% 100%, 0 100%);
+        transform: translateZ(54px) rotateX(-89.9deg);
+        filter: brightness(0.83);
       }
 
       100% {
-        left: -6%;
-        width: 112%;
-        clip-path: polygon(0 0, 100% 0, 94.64% 100%, 5.36% 100%);
-        transform: rotateX(-89.9deg);
+        clip-path: polygon(-20% 0, 120% 0, 100% 100%, 0 100%);
+        transform: translateZ(42px) rotateX(-89.9deg);
         filter: brightness(0.8);
       }
     }
@@ -433,34 +431,26 @@
     @keyframes flipBack {
       0%,
       54% {
-        left: -9%;
-        width: 118%;
-        clip-path: polygon(7.63% 0, 92.37% 0, 100% 100%, 0 100%);
-        transform: rotateX(90deg);
+        clip-path: polygon(0 0, 100% 0, 124% 100%, -24% 100%);
+        transform: translateZ(54px) rotateX(90deg);
         filter: brightness(0.82);
       }
 
-      78% {
-        left: -5%;
-        width: 110%;
-        clip-path: polygon(4.55% 0, 95.45% 0, 100% 100%, 0 100%);
-        transform: rotateX(28deg);
-        filter: brightness(0.95);
+      76% {
+        clip-path: polygon(0 0, 100% 0, 116% 100%, -16% 100%);
+        transform: translateZ(24px) rotateX(24deg);
+        filter: brightness(0.96);
       }
 
-      94% {
-        left: -2%;
-        width: 104%;
-        clip-path: polygon(1.92% 0, 98.08% 0, 100% 100%, 0 100%);
-        transform: rotateX(-6deg);
+      92% {
+        clip-path: polygon(0 0, 100% 0, 106% 100%, -6% 100%);
+        transform: translateZ(8px) rotateX(-4deg);
         filter: brightness(1.01);
       }
 
       100% {
-        left: 0;
-        width: 100%;
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-        transform: rotateX(0deg);
+        transform: translateZ(0) rotateX(0deg);
         filter: brightness(1);
       }
     }
