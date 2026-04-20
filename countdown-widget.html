@@ -326,15 +326,17 @@
 
     .digit-face-top {
       border-radius: var(--radius) var(--radius) 0 0;
+      clip-path: inset(0 round var(--radius) var(--radius) 0 0);
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 78%);
     }
 
     .digit-face-top.digit-face-next {
-      clip-path: inset(0 0 100% 0);
+      clip-path: inset(0 0 100% 0 round var(--radius) var(--radius) 0 0);
     }
 
     .digit-face-bottom {
       border-radius: 0 0 var(--radius) var(--radius);
+      clip-path: inset(0 round 0 0 var(--radius) var(--radius));
       background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), transparent 70%);
     }
 
@@ -358,7 +360,8 @@
 
     .digit-flap-front {
       top: 0;
-      border-radius: var(--radius) var(--radius) 0 0;
+      border-radius: var(--radius) var(--radius) calc(var(--radius) * 0.32) calc(var(--radius) * 0.32);
+      clip-path: inset(0 round var(--radius) var(--radius) calc(var(--radius) * 0.32) calc(var(--radius) * 0.32));
       transform-origin: bottom center;
       animation: flipFront var(--flip-duration) cubic-bezier(0.22, 0.76, 0.18, 1) both;
       box-shadow:
@@ -370,7 +373,8 @@
     .digit-flap-back {
       top: 50%;
       bottom: auto;
-      border-radius: 0 0 var(--radius) var(--radius);
+      border-radius: calc(var(--radius) * 0.32) calc(var(--radius) * 0.32) var(--radius) var(--radius);
+      clip-path: inset(0 round calc(var(--radius) * 0.32) calc(var(--radius) * 0.32) var(--radius) var(--radius));
       transform-origin: top center;
       transform: rotateX(90deg);
       animation: flipBack var(--flip-duration) cubic-bezier(0.2, 0.74, 0.2, 1) both;
