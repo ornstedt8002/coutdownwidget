@@ -1038,7 +1038,12 @@
       }
     };
 
-    form.addEventListener("input", updateOutput);
+    const syncUi = () => {
+      updateRangeLabels();
+      updateOutput();
+    };
+
+    form.addEventListener("input", syncUi);
     controls.theme.addEventListener("change", (event) => {
       applyThemePreset(event.target.value);
       updateOutput();
