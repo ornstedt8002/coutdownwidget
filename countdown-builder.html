@@ -360,6 +360,36 @@
 
         <div class="split">
           <label>
+            Siffrornas typsnitt
+            <select id="digitFontFamily">
+              <option value="default">Standard</option>
+              <option value="montserrat">Montserrat</option>
+              <option value="dm-sans">DM Sans</option>
+              <option value="space-grotesk">Space Grotesk</option>
+              <option value="oswald">Oswald</option>
+              <option value="bebas-neue">Bebas Neue</option>
+              <option value="playfair">Playfair Display</option>
+              <option value="georgia">Georgia</option>
+              <option value="monospace">Monospace</option>
+            </select>
+          </label>
+          <label>
+            Etiketternas typsnitt
+            <select id="labelFontFamily">
+              <option value="default">Standard</option>
+              <option value="dm-sans">DM Sans</option>
+              <option value="montserrat">Montserrat</option>
+              <option value="space-grotesk">Space Grotesk</option>
+              <option value="playfair">Playfair Display</option>
+              <option value="oswald">Oswald</option>
+              <option value="georgia">Georgia</option>
+              <option value="monospace">Monospace</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
             Accent
             <input type="color" id="accent">
           </label>
@@ -698,7 +728,7 @@
     const publishStatus = document.getElementById("publishStatus");
 
     const ids = [
-      "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "accent",
+      "date", "time", "offset", "lang", "title", "subtitle", "theme", "daysDigits", "digitFontFamily", "labelFontFamily", "accent",
       "card", "cardColor", "cardOpacity", "cardBorder", "cardBorderColor", "cardBorderOpacity", "label", "separator", "image", "backgroundColor", "backgroundOpacity", "background", "hostUrl", "radius", "gap",
       "width", "height", "digitFont", "showLabels", "showSeparators", "flip", "publishRepo", "publishBranch", "publishPath",
       "publishMessage", "githubToken"
@@ -765,6 +795,8 @@
     controls.theme.value = "soft";
     controls.lang.value = "sv";
     controls.daysDigits.value = "3";
+    controls.digitFontFamily.value = "default";
+    controls.labelFontFamily.value = "default";
     controls.width.value = "940";
     controls.height.value = "150";
     controls.digitFont.value = "43";
@@ -866,7 +898,9 @@
         gap: controls.gap.value,
         width: controls.width.value,
         height: controls.height.value,
-        digitFont: controls.digitFont.value
+        digitFont: controls.digitFont.value,
+        digitFontFamily: controls.digitFontFamily.value,
+        labelFontFamily: controls.labelFontFamily.value
       };
 
       addConfigValue(payload, "title", controls.title.value.trim());
