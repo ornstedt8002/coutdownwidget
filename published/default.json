@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-21T11:42:00.463Z",
+  "updatedAt": "2026-04-21T11:44:59.000Z",
   "settings": {
     "target": "2026-05-05T18:00:00+02:00",
     "theme": "soft",
@@ -14,7 +14,7 @@
     "width": "940",
     "height": "100",
     "digitFont": "43",
-    "digitFontFamily": "nunito",
+    "digitFontFamily": "manrope",
     "labelFontFamily": "nunito",
     "accent": "#b7c49f",
     "cardColor": "#ffffff",
