@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Countdown Widget</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Montserrat:wght@400;500;700&family=Oswald:wght@400;500;700&family=Playfair+Display:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&display=swap");
+
     :root {
       color-scheme: light;
       --image-url: none;
@@ -23,7 +25,9 @@
       --digit-width: 62px;
       --digit-height: 86px;
       --digit-font-size: 2.7rem;
+      --digit-font-family: "Aptos", "Trebuchet MS", "Segoe UI", sans-serif;
       --label-font-size: 1rem;
+      --label-font-family: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
       --title-font-size: 1.1rem;
       --panel-padding: 0px;
       --blur-strength: 0px;
@@ -301,6 +305,7 @@
       overflow: hidden;
       color: inherit;
       font-size: var(--digit-font-size);
+      font-family: var(--digit-font-family);
       font-weight: 700;
       line-height: 1;
       letter-spacing: -0.06em;
@@ -623,6 +628,7 @@
     .label {
       color: var(--label-color);
       font-size: clamp(0.92rem, 1.4vw, var(--label-font-size));
+      font-family: var(--label-font-family);
       font-weight: 700;
       line-height: 1.15;
       text-align: center;
@@ -742,11 +748,13 @@
       digitWidth: "",
       digitHeight: "",
       digitFont: "",
+      digitFontFamily: "",
       panelBg: "",
       panelBorder: "",
       panelShadow: "",
       titleSize: "",
       labelSize: "",
+      labelFontFamily: "",
       padding: "",
       labels: ""
     };
@@ -760,6 +768,19 @@
     const countdown = document.getElementById("countdown");
     const status = document.getElementById("status");
     let responsiveFrame = 0;
+    const DEFAULT_DIGIT_FONT_FAMILY = '"Aptos", "Trebuchet MS", "Segoe UI", sans-serif';
+    const DEFAULT_LABEL_FONT_FAMILY = '"Trebuchet MS", "Aptos", "Segoe UI", sans-serif';
+    const FONT_FAMILIES = {
+      default: DEFAULT_DIGIT_FONT_FAMILY,
+      "dm-sans": '"DM Sans", "Aptos", "Segoe UI", sans-serif',
+      montserrat: '"Montserrat", "Aptos", "Segoe UI", sans-serif',
+      "space-grotesk": '"Space Grotesk", "Aptos", "Segoe UI", sans-serif',
+      oswald: '"Oswald", "Arial Narrow", sans-serif',
+      "bebas-neue": '"Bebas Neue", "Oswald", sans-serif',
+      playfair: '"Playfair Display", Georgia, serif',
+      georgia: 'Georgia, "Times New Roman", serif',
+      monospace: '"Consolas", "Courier New", monospace'
+    };
 
     const parseBoolean = (value, fallback) => {
       if (value === "" || value == null) return fallback;
@@ -778,6 +799,12 @@
     const applyVar = (name, value, formatter = (input) => input) => {
       if (!value && value !== 0) return;
       body.style.setProperty(name, formatter(value));
+    };
+
+    const resolveFontFamily = (value, fallback) => {
+      if (!value) return fallback;
+      const normalized = String(value).trim().toLowerCase();
+      return FONT_FAMILIES[normalized] || String(value);
     };
 
     const scaleShadowAlpha = (shadowValue, factor) => {
@@ -1017,11 +1044,13 @@
       applyVar("--digit-width", config.digitWidth, (value) => value + "px");
       applyVar("--digit-height", config.digitHeight || config.height, (value) => value + "px");
       applyVar("--digit-font-size", config.digitFont, (value) => value + "px");
+      applyVar("--digit-font-family", resolveFontFamily(config.digitFontFamily, DEFAULT_DIGIT_FONT_FAMILY));
       applyVar("--panel-bg", config.panelBg);
       applyVar("--panel-border", config.panelBorder);
       applyVar("--panel-shadow", config.panelShadow);
       applyVar("--title-font-size", config.titleSize, (value) => value + "px");
       applyVar("--label-font-size", config.labelSize, (value) => value + "px");
+      applyVar("--label-font-family", resolveFontFamily(config.labelFontFamily, DEFAULT_LABEL_FONT_FAMILY));
       applyVar("--panel-padding", config.padding, (value) => value + "px");
 
     };
