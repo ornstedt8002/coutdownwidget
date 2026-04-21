@@ -35,7 +35,8 @@
       --panel-bg: transparent;
       --panel-border: transparent;
       --panel-shadow: none;
-      --flip-duration: 0.94s;
+      --flip-duration: 0.76s;
+      --flip-ease: cubic-bezier(0.22, 0.72, 0.2, 1);
       --responsive-scale: 1;
     }
 
@@ -282,6 +283,7 @@
       perspective: 2400px;
       perspective-origin: 50% 46%;
       transform-style: preserve-3d;
+      will-change: transform;
     }
 
     .digit::after {
@@ -317,6 +319,7 @@
     .digit-face {
       z-index: 1;
       backface-visibility: hidden;
+      transform: translateZ(0.01px);
     }
 
     .digit-face span,
@@ -382,7 +385,8 @@
       pointer-events: none;
       transform-style: preserve-3d;
       overflow: hidden;
-      will-change: transform, filter, left, width;
+      contain: paint;
+      will-change: transform, filter, opacity;
     }
 
     .digit-flap::before {
@@ -395,6 +399,7 @@
         inset 0 0 0 1px rgba(255, 255, 255, 0.04),
         0 14px 24px rgba(0, 0, 0, 0.2);
       pointer-events: none;
+      will-change: clip-path, transform, opacity;
     }
 
     .digit-flap-front::before,
@@ -413,13 +418,13 @@
       width: 100%;
       border-radius: var(--radius) var(--radius) 0 0;
       transform-origin: bottom center;
-      animation: flipFrontBox var(--flip-duration) cubic-bezier(0.24, 0.72, 0.16, 1) both;
+      animation: flipFrontBox var(--flip-duration) var(--flip-ease) both;
       filter: brightness(1);
     }
 
     .digit-flap-front::before {
       border-radius: inherit;
-      animation: flipFrontSurface var(--flip-duration) cubic-bezier(0.24, 0.72, 0.16, 1) both;
+      animation: flipFrontSurface var(--flip-duration) var(--flip-ease) both;
       box-shadow:
         inset 0 -12px 24px rgba(0, 0, 0, 0.14),
         0 14px 24px rgba(0, 0, 0, 0.22);
@@ -432,14 +437,14 @@
       width: 100%;
       border-radius: 0 0 var(--radius) var(--radius);
       transform-origin: top center;
-      transform: rotateX(90deg);
-      animation: flipBackBox var(--flip-duration) cubic-bezier(0.24, 0.72, 0.16, 1) both;
+      transform: translateZ(0) scaleX(1) rotateX(90deg);
+      animation: flipBackBox var(--flip-duration) var(--flip-ease) both;
       filter: brightness(0.86);
     }
 
     .digit-flap-back::before {
       border-radius: inherit;
-      animation: flipBackSurface var(--flip-duration) cubic-bezier(0.24, 0.72, 0.16, 1) both;
+      animation: flipBackSurface var(--flip-duration) var(--flip-ease) both;
       box-shadow:
         inset 0 12px 24px rgba(255, 255, 255, 0.08),
         0 14px 24px rgba(0, 0, 0, 0.22);
@@ -447,44 +452,32 @@
 
     @keyframes flipFrontBox {
       0% {
-        left: 0;
-        width: 100%;
-        transform: translateZ(0) rotateX(0deg);
+        transform: translateZ(0) scaleX(1) rotateX(0deg);
         filter: brightness(1);
       }
 
-      10% {
-        left: -3%;
-        width: 106%;
-        transform: translateZ(8px) rotateX(-7deg);
-        filter: brightness(1.03);
+      12% {
+        transform: translateZ(10px) scaleX(1.04) rotateX(-8deg);
+        filter: brightness(1.025);
       }
 
-      24% {
-        left: -8%;
-        width: 116%;
-        transform: translateZ(20px) rotateX(-18deg);
-        filter: brightness(1.06);
+      26% {
+        transform: translateZ(24px) scaleX(1.11) rotateX(-20deg);
+        filter: brightness(1.05);
       }
 
-      42% {
-        left: -16%;
-        width: 132%;
-        transform: translateZ(38px) rotateX(-52deg);
-        filter: brightness(1);
+      40% {
+        transform: translateZ(42px) scaleX(1.18) rotateX(-56deg);
+        filter: brightness(0.98);
       }
 
-      54% {
-        left: -22%;
-        width: 144%;
-        transform: translateZ(54px) rotateX(-89.9deg);
-        filter: brightness(0.83);
+      50% {
+        transform: translateZ(56px) scaleX(1.24) rotateX(-89.9deg);
+        filter: brightness(0.84);
       }
 
       100% {
-        left: -18%;
-        width: 136%;
-        transform: translateZ(42px) rotateX(-89.9deg);
+        transform: translateZ(42px) scaleX(1.16) rotateX(-89.9deg);
         filter: brightness(0.8);
       }
     }
@@ -494,70 +487,62 @@
         clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       }
 
-      10% {
+      12% {
         clip-path: polygon(0 0, 100% 0, 97.17% 100%, 2.83% 100%);
       }
 
-      24% {
+      26% {
         clip-path: polygon(0 0, 100% 0, 93.1% 100%, 6.9% 100%);
       }
 
-      42% {
+      40% {
         clip-path: polygon(0 0, 100% 0, 87.88% 100%, 12.12% 100%);
       }
 
-      54% {
-        clip-path: polygon(0 0, 100% 0, 84.72% 100%, 15.28% 100%);
+      50% {
+        clip-path: polygon(0 0, 100% 0, 82.4% 100%, 17.6% 100%);
       }
 
       100% {
-        clip-path: polygon(0 0, 100% 0, 86.76% 100%, 13.24% 100%);
+        clip-path: polygon(0 0, 100% 0, 86.6% 100%, 13.4% 100%);
       }
     }
 
     @keyframes flipBackBox {
       0%,
-      54% {
-        left: -22%;
-        width: 144%;
-        transform: translateZ(54px) rotateX(90deg);
+      50% {
+        transform: translateZ(56px) scaleX(1.24) rotateX(90deg);
         filter: brightness(0.82);
       }
 
-      76% {
-        left: -10%;
-        width: 120%;
-        transform: translateZ(24px) rotateX(24deg);
+      72% {
+        transform: translateZ(26px) scaleX(1.12) rotateX(24deg);
         filter: brightness(0.96);
       }
 
-      92% {
-        left: -4%;
-        width: 108%;
-        transform: translateZ(8px) rotateX(-4deg);
+      90% {
+        transform: translateZ(8px) scaleX(1.04) rotateX(-3deg);
         filter: brightness(1.01);
       }
 
       100% {
-        left: 0;
-        width: 100%;
-        transform: translateZ(0) rotateX(0deg);
+        transform: translateZ(0) scaleX(1) rotateX(0deg);
         filter: brightness(1);
       }
     }
 
     @keyframes flipBackSurface {
       0%,
-      54% {
-        clip-path: polygon(15.28% 0, 84.72% 0, 100% 100%, 0 100%);
+      50% {
+        clip-path: polygon(17.6% 0, 82.4% 0, 100% 100%, 0 100%);
       }
 
-      76% {
-        clip-path: polygon(8.33% 0, 91.67% 0, 100% 100%, 0 100%);
+      72% {
+        clip-path: polygon(9.6% 0, 90.4% 0, 100% 100%, 0 100%);
       }
 
-      92% {
-        clip-path: polygon(3.7% 0, 96.3% 0, 100% 100%, 0 100%);
+      90% {
+        clip-path: polygon(4.1% 0, 95.9% 0, 100% 100%, 0 100%);
       }
 
       100% {
@@ -570,7 +555,7 @@
         clip-path: inset(0 0 100% 0);
       }
 
-      54% {
+      50% {
         clip-path: inset(0 0 0 0);
       }
 
@@ -581,7 +566,7 @@
 
     @keyframes hidePrevBottom {
       0%,
-      88% {
+      84% {
         opacity: 1;
       }
 
@@ -592,7 +577,7 @@
 
     @keyframes revealNextBottom {
       0%,
-      86% {
+      82% {
         opacity: 0;
       }
 
@@ -602,15 +587,15 @@
     }
 
     .digit.is-flipping .digit-face-bottom.digit-face-prev {
-      animation: hidePrevBottom var(--flip-duration) linear both;
+      animation: hidePrevBottom var(--flip-duration) ease-out both;
     }
 
     .digit.is-flipping .digit-face-bottom.digit-face-next {
-      animation: revealNextBottom var(--flip-duration) linear both;
+      animation: revealNextBottom var(--flip-duration) ease-out both;
     }
 
     .digit.is-flipping .digit-face-top.digit-face-next {
-      animation: revealTopBehind var(--flip-duration) linear both;
+      animation: revealTopBehind var(--flip-duration) ease-out both;
     }
 
     .separator {
